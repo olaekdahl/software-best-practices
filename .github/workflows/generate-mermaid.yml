@@ -37,8 +37,6 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Authenticate gh with a Copilot-enabled token
-          echo "$GH_TOKEN" | gh auth login --with-token
           gh extension install github/gh-copilot || true
           # Ask Copilot CLI to create a concise Mermaid diagram for app.py
           PROMPT="Create a concise Mermaid flowchart summarizing the main components and relationships in app.py. Return only one mermaid fenced code block."
