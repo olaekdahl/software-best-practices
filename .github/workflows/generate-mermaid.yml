@@ -1,0 +1,55 @@
+name: Generate Mermaid Diagrams
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "app.py"
+      - "scripts/gen_mermaid.py"
+      - ".github/workflows/generate-mermaid.yml"
+
+permissions:
+  models: read
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Generate Mermaid diagrams (AST-based)
+        env:
+          SOURCE_FILE: app.py
+          OUTPUT_DIR: diagrams/generated
+        run: |
+          python scripts/gen_mermaid.py
+
+      - name: (Optional) Generate Mermaid via GitHub Copilot CLI
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Authenticate gh with a Copilot-enabled token
+          echo "$GITHUB_TOKEN" | gh auth login --with-token
+          gh extension install github/gh-copilot || true
+          # Ask Copilot CLI to create a concise Mermaid diagram for app.py
+          PROMPT="Create a concise Mermaid flowchart summarizing the main components and relationships in app.py. Return only one mermaid fenced code block."
+          gh copilot -p "$PROMPT" > diagrams/generated/app_ai_flowchart.md || true
+
+      - name: Create Pull Request with updates
+        uses: peter-evans/create-pull-request@v6
+        with:
+          title: "chore: update Mermaid diagrams"
+          commit-message: "chore: auto-generate Mermaid diagrams"
+          branch: bot/update-mermaid-diagrams
+          delete-branch: true
+          add-paths: |
+            diagrams/generated/**

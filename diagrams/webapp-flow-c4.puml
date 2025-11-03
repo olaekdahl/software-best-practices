@@ -1,0 +1,13 @@
+@startuml
+!include ./c4/C4_Container.puml
+Person(user, "User")
+System_Boundary(webapp, "Web Application") {
+    Container(browser, "Browser", "HTML/JS", "Renders UI")
+    Container(api, "API", "Node/Express", "Handles requests")
+    ContainerDb(db, "Database", "PostgreSQL", "Stores data")
+}
+Rel(user, browser, "Uses")
+Rel(browser, api, "Sends requests")
+Rel(api, db, "Reads/Writes data")
+@enduml
+

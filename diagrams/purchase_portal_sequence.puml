@@ -1,0 +1,24 @@
+@startuml
+title Purchase Portal – Submit Order Flow
+
+actor Parent
+... AI Chatbot suggests order tracking ...
+participant Portal
+participant Vendor
+participant SendGrid
+
+Parent -> Portal: Submit Order
+Portal -> Vendor: Notify vendor of new order
+Vendor --> Portal: Confirm acceptance
+Portal -> SendGrid: Send confirmation email
+SendGrid --> Parent: Email sent
+
+alt Vendor Rejects Order
+    Vendor --> Portal: Reject reason
+    Portal --> Parent: Display error message
+else Vendor Accepts Order
+    Portal -> Parent: Show “Order Approved”
+end
+
+Portal <-- Parent: Acknowledgement
+@enduml
