@@ -1,0 +1,27 @@
+@startuml Code
+title Code-Level Diagram - Domain Model
+
+class Order {
+  +UUID id
+  +Status status
+  +addItem(sku: String, qty: int)
+  +Money total()
+}
+class LineItem {
+  +String sku
+  +int qty
+  +Money price
+}
+class Payment {
+  +Money amount
+  +boolean authorized
+}
+
+Order "1" o-- "*" LineItem : contains
+Order "0..1" --> "1" Payment : settled by
+
+note right of Order
+  Aggregate Root
+end note
+
+@enduml

@@ -1,0 +1,19 @@
+@startuml Container
+!include ./c4/C4_Container.puml
+title Container Diagram - Software Best Practices
+
+Person(user, "User")
+System_Boundary(sys, "Purchase Portal") {
+  Container(web, "Web App", "React", "Delivers UI")
+  Container(api, "API", "Node/Express", "REST endpoints")
+  Container(order, "Order Service", "Java/Spring", "Order management")
+  ContainerDb(db, "Database", "PostgreSQL", "Stores data")
+}
+
+Rel(user, web, "Uses", "HTTPS")
+Rel(web, api, "Calls", "HTTPS")
+Rel(api, order, "Calls", "REST/gRPC")
+Rel(order, db, "Reads/Writes", "SQL")
+
+SHOW_LEGEND()
+@enduml

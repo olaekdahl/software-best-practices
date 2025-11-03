@@ -1,0 +1,20 @@
+@startuml Component
+!include ./c4/C4_Component.puml
+title Component Diagram - Order Service
+
+Container_Boundary(order, "Order Service") {
+  Component(api, "Order API", "HTTP Controllers", "Validates and handles requests")
+  Component(app, "Application Service", "Use cases", "Coordinates domain operations")
+  Component(domain, "Domain", "Entities & Aggregates", "Business rules")
+  Component(repo, "Repository", "Data access", "Persistence operations")
+}
+
+Component(db, "PostgreSQL", "Database", "Order storage")
+
+Rel(api, app, "Calls")
+Rel(app, domain, "Invokes domain logic")
+Rel(app, repo, "Persists/loads")
+Rel(repo, db, "SQL")
+
+SHOW_LEGEND()
+@enduml

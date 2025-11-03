@@ -1,0 +1,15 @@
+@startuml Context
+!include ./c4/C4_Context.puml
+title Context Diagram – Software Best Practices
+
+Person(user, "User", "Interacts with the system")
+System(system, "Purchase Portal", "Allows users to browse and place orders")
+System_Ext(email, "Email Service", "Sends notifications")
+System_Ext(payments, "Payment Provider", "Processes payments")
+
+Rel(user, system, "Uses", "HTTPS")
+Rel(system, email, "Sends notifications")
+Rel(system, payments, "Charges cards")
+
+SHOW_LEGEND()
+@enduml
