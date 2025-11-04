@@ -33,24 +33,54 @@ jobs:
         run: |
           python scripts/gen_mermaid.py
 
-      - name: (Optional) Generate Mermaid via GitHub Copilot CLI
+      - name: (Optional) Generate Mermaid via REST API
         env:
-          GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           set -euo pipefail
-          gh extension install github/gh-copilot || true
 
-          # Ask Copilot CLI to create a concise Mermaid diagram for app.py
           PROMPT='Create a concise Mermaid flowchart summarizing the main components and relationships in app.py. Return only one mermaid fenced code block starting with ```mermaid.'
-          TMP_OUT=$(mktemp)
-          gh copilot -p "$PROMPT" > "$TMP_OUT" || true
-
-          # Extract the first mermaid fenced block if present; otherwise write a placeholder
           mkdir -p diagrams/generated
-          if [ -s "$TMP_OUT" ] && grep -q '```mermaid' "$TMP_OUT"; then
+          TMP_OUT=$(mktemp)
+
+          # Try OpenAI Chat Completions API if OPENAI_API_KEY is available
+          if [ -n "${OPENAI_API_KEY:-}" ]; then
+            curl -sS \
+              -H 'Content-Type: application/json' \
+              -H "Authorization: Bearer ${OPENAI_API_KEY}" \
+              -d "$(jq -n --arg sys 'You are a helpful assistant that only returns a single fenced Mermaid code block.' --arg usr "$PROMPT" '{model:"gpt-4o-mini", messages:[{role:"system", content:$sys},{role:"user", content:$usr}], temperature:0.2}')" \
+              https://api.openai.com/v1/chat/completions \
+              | jq -r '.choices[0].message.content' > "$TMP_OUT" || true
+          fi
+
+          # If still empty, try GitHub Models Responses API (requires Models access in org)
+          if [ ! -s "$TMP_OUT" ]; then
+            BODY=$(mktemp)
+            printf '%s' "$(jq -n --arg txt "$PROMPT" '{input:[{role:"user",content:[{type:"text",text:$txt}]}]}')" > "$BODY"
+            curl -sS \
+              -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+              -H 'Accept: application/json' \
+              -H 'X-GitHub-Api-Version: 2023-07-07' \
+              -H 'Content-Type: application/json' \
+              --data-binary @"$BODY" \
+              https://api.github.com/models/gpt-4o-mini/responses \
+              | jq -r '(.output_text // .choices[0].message.content // null)' > "$TMP_OUT" || true
+          fi
+
+          # Extract the first mermaid fenced block if present; otherwise write a placeholder with guidance
+          if [ -s "$TMP_OUT" ] && grep -q '^```mermaid' "$TMP_OUT"; then
             awk 'BEGIN{p=0} (!p && $0 ~ /^```mermaid\s*$/){p=1; print; next} (p && $0 ~ /^```\s*$/){print; exit} p{print}' "$TMP_OUT" > diagrams/generated/app_ai_flowchart.md
           else
-            printf "# AI Mermaid flowchart\n\n_No Copilot output (missing access or empty response)._\n" > diagrams/generated/app_ai_flowchart.md
+            printf '%s\n' \
+              '# AI Mermaid flowchart' \
+              '' \
+              '_No AI output via REST API._' \
+              '' \
+              'To enable this step:' \
+              '- Add an OpenAI API key as repository secret OPENAI_API_KEY, or' \
+              '- Enable GitHub Models in your org and ensure the default GITHUB_TOKEN has access.' \
+              > diagrams/generated/app_ai_flowchart.md
           fi
 
       - name: Create Pull Request with updates
