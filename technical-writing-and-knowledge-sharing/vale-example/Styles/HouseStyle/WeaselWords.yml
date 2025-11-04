@@ -1,0 +1,19 @@
+extends: existence
+message: "Avoid weasel word: '%s'. Be concrete."
+ignorecase: true
+level: warning
+scope: sentence
+tokens:
+  - just
+  - very
+  - really
+  - quite
+  - simply
+  - basically
+  - some
+  - various
+  - fairly
+  - mostly
+  - probably
+  - maybe
+  - perhaps

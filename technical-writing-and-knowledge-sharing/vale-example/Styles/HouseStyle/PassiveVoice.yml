@@ -1,0 +1,8 @@
+extends: existence
+message: "Check for passive voice: '%s' — prefer active where possible."
+level: suggestion
+ignorecase: true
+scope: sentence
+nonword: true
+tokens:
+  - '(?:\b(?:am|are|is|was|were|be|been|being)\b +[A-Za-z]+ed\b)'

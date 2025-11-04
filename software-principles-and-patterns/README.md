@@ -61,6 +61,7 @@ Tip: Run a "bad" first, then the corresponding "good". Ask the audience what cha
 - Emphasize: principles guide choices; patterns are reusable solutions, not rules.
 
 Files:
+
 - `00-overview/messy_code_bad.py`
 - `00-overview/messy_code_refactor.py`
 
@@ -76,6 +77,7 @@ Files:
 - DRY/KISS/YAGNI: Avoid duplication, keep it simple, don’t build what you don’t need.
 
 Files:
+
 - `01-principles/srp_ocp_order_processor_bad.py`
 - `01-principles/srp_ocp_order_processor_good.py`
 - `01-principles/lsp_isp_bad.py`
@@ -95,6 +97,7 @@ Activity idea: give the audience 60s to spot violations before running the "good
 - Use micro-demos to show intent, not production frameworks.
 
 Files:
+
 - `02-patterns/factory_method_singleton.py`
 - `02-patterns/adapter_facade.py`
 - `02-patterns/observer_strategy.py`
