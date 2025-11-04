@@ -1,0 +1,28 @@
+# Example Architecture Notes
+
+This example uses a minimal Python module to keep documentation generation fast and focused. Consider pairing this with a diagram generator.
+
+## Module layout
+
+- Module folder under the source directory — Core types and helpers
+  - `Widget` data class
+  - `render_markdown(widget)`
+  - `summarize(widgets)`
+
+## Data flow
+
+- Input: Widget instances (name, fields, tags)
+- Processing: Markdown rendering, collection summary
+- Output: Plain Markdown and summary strings
+
+## Diagram idea (Mermaid)
+
+```mermaid
+flowchart TD
+  A[Widget instances] --> B[render_markdown]
+  A --> C[summarize]
+  B --> D[Markdown file]
+  C --> E[Summary paragraph]
+```
+
+Tip: You can also generate C4 or PlantUML diagrams using the templates in `software-diagramming/`.
