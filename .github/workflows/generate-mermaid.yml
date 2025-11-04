@@ -41,14 +41,14 @@ jobs:
           gh extension install github/gh-copilot || true
 
           # Ask Copilot CLI to create a concise Mermaid diagram for app.py
-          PROMPT="Create a concise Mermaid flowchart summarizing the main components and relationships in app.py. Return only one mermaid fenced code block starting with ```mermaid."
+          PROMPT='Create a concise Mermaid flowchart summarizing the main components and relationships in app.py. Return only one mermaid fenced code block starting with ```mermaid.'
           TMP_OUT=$(mktemp)
           gh copilot -p "$PROMPT" > "$TMP_OUT" || true
 
           # Extract the first mermaid fenced block if present; otherwise write a placeholder
           mkdir -p diagrams/generated
           if [ -s "$TMP_OUT" ] && grep -q '```mermaid' "$TMP_OUT"; then
-            awk 'BEGIN{p=0} /```mermaid/{if(p==0){p=1; print; next} else{print; exit}} p{print}' "$TMP_OUT" > diagrams/generated/app_ai_flowchart.md
+            awk 'BEGIN{p=0} (!p && $0 ~ /^```mermaid\s*$/){p=1; print; next} (p && $0 ~ /^```\s*$/){print; exit} p{print}' "$TMP_OUT" > diagrams/generated/app_ai_flowchart.md
           else
             printf "# AI Mermaid flowchart\n\n_No Copilot output (missing access or empty response)._\n" > diagrams/generated/app_ai_flowchart.md
           fi
