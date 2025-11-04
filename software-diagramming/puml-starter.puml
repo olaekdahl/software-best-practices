@@ -1,0 +1,85 @@
+@startuml 
+' MIT License
+' SPDX-License-Identifier: MIT
+' Author: Ola Ekdahl
+' Owner: Ascendient Learning
+' Year: 2025
+' Purpose: Reusable diagram template with stereotypes, palette, legend, and helpers.
+
+' ---------- Palette ----------
+' external  : #FFFBE6 / #FFB000
+' queue     : #E8F5E9 / #2E7D32
+' db        : #E3F2FD / #1565C0
+' boundary  : #F3E5F5 / #6A1B9A
+
+!define AUTHOR "Ola Ekdahl"
+!define OWNER  "Ascendient Learning"
+
+' ---------- Global Styles ----------
+skinparam dpi 150
+skinparam shadowing false
+skinparam DefaultFontName Inter, Segoe UI, Arial
+
+' Stereotype-based colors
+skinparam rectangle {
+  BackgroundColor<<external>> #FFFBE6
+  BorderColor<<external>>     #FFB000
+  BorderThickness<<external>> 2
+  RoundCorner<<external>>     10
+
+  BackgroundColor<<queue>>    #E8F5E9
+  BorderColor<<queue>>        #2E7D32
+  BorderThickness<<queue>>    2
+  RoundCorner<<queue>>        6
+
+  BackgroundColor<<boundary>> #F3E5F5
+  BorderColor<<boundary>>     #6A1B9A
+  BorderThickness<<boundary>> 2
+  RoundCorner<<boundary>>     4
+}
+
+skinparam component {
+  BackgroundColor<<db>>       #E3F2FD
+  BorderColor<<db>>           #1565C0
+  BorderThickness<<db>>       2
+}
+
+' Database shape via built-in "database"
+skinparam database {
+  BackgroundColor<<db>>       #E3F2FD
+  BorderColor<<db>>           #1565C0
+  BorderThickness<<db>>       2
+}
+
+' ---------- Helpers (“macros”) ----------
+' Generic box with stereotype
+!define BOX(label, alias, st) rectangle "label" as alias <<st>>
+
+' Convenience wrappers
+!define EXT(label, alias)     BOX(label, alias, external)
+!define QUEUE(label, alias)   BOX(label, alias, queue)
+!define BOUND(label, alias)   BOX(label, alias, boundary)
+!define DB(label, alias)      database "label" as alias <<db>>
+
+' ---------- Example usage (delete below for new diagrams) ----------
+title Example System Diagram\nAuthor: %AUTHOR%\nOwner: %OWNER%
+
+EXT("Payments Provider", EXT1)
+BOUND("API Gateway", G1)
+QUEUE("Orders Queue", Q1)
+DB("Orders DB", DB1)
+
+EXT1 --> G1
+G1 --> Q1
+G1 --> DB1
+
+' ---------- Legend ----------
+legend right
+  |= Stereotype |= Meaning |= Style |
+  | <<external>> | External system/integration | pale yellow, bold border |
+  | <<queue>>    | Async message queue/topic   | pale green, bold border  |
+  | <<db>>       | Database or datastore       | pale blue, bold border   |
+  | <<boundary>> | Trust/API boundary          | lavender, bold border    |
+endlegend
+
+@enduml

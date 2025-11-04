@@ -33,3 +33,14 @@
         LB --> WebServerA
         LB --> WebServerB
 ```
+
+``` mermaid
+sequenceDiagram
+    participant User
+    participant API
+    participant DB
+    User->>API: Sends request
+    API->>DB: Query data
+    DB-->>API: Return result
+    API-->>User: Response
+```

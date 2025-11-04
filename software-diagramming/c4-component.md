@@ -1,5 +1,5 @@
 ``` mermaid
-  flowchart LR
+  flowchart LR 
   subgraph "Order Service"
     API[Order API\nHTTP Controllers\nValidates/handles requests]
     APP[Application Service\nUse cases\nCoordinates domain]

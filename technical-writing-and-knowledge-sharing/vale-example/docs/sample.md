@@ -9,3 +9,5 @@ It is very basic and just a simple overview that mostly covers some various aspe
 Perhaps it was implemented by the team in a way that is quite hard to test.
 
 In summary, we should really just focus on the core ideas.
+
+Let's talk about CRUD statements in SQL.

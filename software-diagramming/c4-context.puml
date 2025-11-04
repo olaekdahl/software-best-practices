@@ -1,6 +1,6 @@
-@startuml Context
+@startuml Context 
 !include ./c4/C4_Context.puml
-title Context Diagram – Software Best Practices
+title Context Diagram - Software Best Practices
 
 Person(user, "User", "Interacts with the system")
 System(system, "Purchase Portal", "Allows users to browse and place orders")
