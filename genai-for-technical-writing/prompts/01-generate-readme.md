@@ -2,12 +2,12 @@
 
 Context:
 
-- Root:{{project root}}
+- Root:{{project_root}}
 - Code: {{code_root}} <!-- e.g., `src/widgetizer/` -->
 - Seeds: {{seed_docs}} <!-- e.g., `docs/overview.md`, `docs/architecture.md` -->
 - Examples: {{examples}} <!-- e.g., `examples/usage.py` -->
-- Folders to exclude: {{list of folders to exclude}}
-- Vale location: {{}}
+- Folders_to_exclude: {{list of folders to exclude}}
+- Vale_ini_location: {{}}
 
 Task:
 
@@ -36,3 +36,4 @@ Linting:
 
 - Use Vale to lint the generated README
 - Use Vale lint output and fix suggestions, warnings, and errors.
+- Vale_ini_location specifies the location for .vale.ini
