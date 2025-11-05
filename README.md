@@ -66,6 +66,112 @@ Prereqs → Install → Run → Verify
   npx @redocly/cli build-docs api-design/jobs-api.yaml -o api-design/jobs-api.html
   ```
 
+## Demos and how to run
+
+- REST vs GraphQL (FastAPI + Strawberry)
+  - Folder: `api-design/rest-graphql-demo/`
+  - Run server (pick one):
+
+    ```bash
+    # install deps once
+    pip install -r requirements.txt
+
+    cd api-design/rest-graphql-demo
+    python3 server.py
+    # or
+    uvicorn server:app --reload --port 9000
+    ```
+
+  - Try REST:
+
+    ```bash
+    curl http://localhost:9000/rest/books
+    curl http://localhost:9000/rest/books/1
+    curl -X POST http://localhost:9000/rest/books \
+      -H "Content-Type: application/json" \
+      -d '{"title":"Refactoring","author":"Martin Fowler"}'
+    ```
+
+  - Try GraphQL (GraphiQL at http://localhost:9000/graphql):
+
+    ```bash
+    curl -X POST http://localhost:9000/graphql -H "Content-Type: application/json" \
+      -d '{"query":"{ books { id title author } }"}'
+    ```
+
+- Architecture fundamentals — Sync HTTP vs Kafka (event-driven)
+  - Folder: `architecture-fundamentals/`
+  - Synchronous HTTP:
+
+    ```bash
+    cd architecture-fundamentals
+    uvicorn sync_http.app:app --reload --port 8000
+    # new terminal
+    curl -X POST http://localhost:8000/order -H "Content-Type: application/json" \
+      -d '{"order_id":"o-1","user_id":"u-1","sku":"ABC","qty":1,"email":"user@example.com"}'
+    ```
+
+  - Kafka version (single-node, KRaft):
+
+    ```bash
+    cd architecture-fundamentals
+    docker compose up -d                       # starts Apache Kafka (official image)
+    uvicorn kafka_version.producer_api:app --reload --port 8001
+    # send an order (fast response)
+    curl -X POST http://localhost:8001/order -H "Content-Type: application/json" \
+      -d '{"order_id":"o-2","user_id":"u-1","sku":"ABC","qty":1,"email":"user@example.com"}'
+    # in separate terminals, start consumers
+    python3 kafka_version/consumers/inventory_consumer.py
+    python3 kafka_version/consumers/payment_consumer.py
+    python3 kafka_version/consumers/email_consumer.py
+    ```
+
+- API design + ReDoc
+  - Folder: `api-design/`
+  - View docs locally:
+
+    ```bash
+    cd api-design
+    python3 -m http.server 8080
+    # open http://localhost:8080/redoc.html
+    ```
+
+  - Lint spec (optional, requires Node):
+
+    ```bash
+    npx @redocly/cli lint api-design/jobs-api.yaml
+    ```
+
+- Principles and patterns (SOLID, GoF)
+  - Folder: `software-principles-and-patterns/`
+  - Run all examples:
+
+    ```bash
+    python3 software-principles-and-patterns/run_all.py
+    ```
+
+  - Or open specific files in `01-principles/` and `02-patterns/` for focused runs.
+
+- Diagramming (C4, Mermaid, PlantUML)
+  - Folder: `software-diagramming/`
+  - View Markdown/PUML files directly in your editor.
+  - Optional: generate Mermaid from code (defaults to `app.py`):
+
+    ```bash
+    # write to diagrams/generated/ by default
+    python3 scripts/gen_mermaid.py
+    # or choose output dir
+    OUTPUT_DIR=software-diagramming/generated python3 scripts/gen_mermaid.py
+    ```
+
+- Technical writing lint (Vale)
+  - Folder: `technical-writing-and-knowledge-sharing/vale-example/`
+  - Requires installing Vale (optional). Then run from that folder:
+
+    ```bash
+    vale docs/
+    ```
+
 ## Configuration
 
 - App host/port
