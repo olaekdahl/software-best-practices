@@ -1,0 +1,155 @@
+openapi: 3.1.0
+info:
+  title: Jobs API (lab)
+  version: 0.1.0
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+paths:
+  /jobs:
+    post:
+      summary: Submit Job
+      operationId: submit_job_jobs_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: Idempotency-Key
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Idempotency-Key
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JobRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /jobs/{job_id}:
+    get:
+      summary: Get Job
+      operationId: get_job_jobs__job_id__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: job_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Job Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    JobRequest:
+      properties:
+        dataset:
+          type: string
+          title: Dataset
+          description: Dataset identifier
+        model:
+          type: string
+          title: Model
+          description: Model to run
+      type: object
+      required:
+      - dataset
+      - model
+      title: JobRequest
+    JobResponse:
+      properties:
+        id:
+          type: string
+          title: Id
+        dataset:
+          type: string
+          title: Dataset
+        model:
+          type: string
+          title: Model
+        status:
+          type: string
+          title: Status
+        created_at:
+          type: number
+          title: Created At
+      type: object
+      required:
+      - id
+      - dataset
+      - model
+      - status
+      - created_at
+      title: JobResponse
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+  securitySchemes:
+    HTTPBearer:
+      type: http
+      scheme: bearer
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+servers:
+- url: https://api.mycompany.com
+  description: Production
+- url: https://staging.mycompany.com
+  description: Staging
+security:
+- bearerAuth: []

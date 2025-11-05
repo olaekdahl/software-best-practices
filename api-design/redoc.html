@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Jobs API Docs (ReDoc)</title>
+    <style>
+      body { margin: 0; padding: 0; }
+      .fallback { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; padding: 16px; }
+    </style>
+  </head>
+  <body>
+    <!-- ReDoc will inject UI into this element -->
+    <div id="redoc-container"></div>
+
+    <div id="fallback" class="fallback" style="display:none">
+      Could not load the ReDoc viewer. You can still open <code>jobs-api.html</code> (if generated)
+      or view the raw <code>jobs-api.yaml</code>.
+    </div>
+
+    <!-- Try primary CDN, then fallback CDN -->
+    <script>
+      (function () {
+        var SPEC_URL = 'jobs-api.yaml';
+
+        function initRedoc() {
+          if (globalThis.Redoc && document.getElementById('redoc-container')) {
+            globalThis.Redoc.init(SPEC_URL, {}, document.getElementById('redoc-container'));
+          } else {
+            showFallback('ReDoc failed to initialize.');
+          }
+        }
+
+        function showFallback(reason) {
+          var fb = document.getElementById('fallback');
+          if (fb) {
+            fb.style.display = 'block';
+            fb.innerHTML = 'Could not load ReDoc (' + reason + '). ' +
+              'Open <code>jobs-api.html</code> (generated via @redocly/cli) or the raw <code>jobs-api.yaml</code>.';
+          }
+        }
+
+        function loadScript(src, onload, onerror) {
+          var s = document.createElement('script');
+          s.src = src;
+          s.onload = onload;
+          s.onerror = onerror;
+          document.head.appendChild(s);
+        }
+
+        var loaded = false;
+        var primary = 'https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js';
+        var secondary = 'https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js';
+
+        loadScript(primary, function () {
+          loaded = true;
+          initRedoc();
+        }, function () {
+          // Try fallback CDN
+          loadScript(secondary, function () {
+            loaded = true;
+            initRedoc();
+          }, function () {
+            showFallback('CDN blocked or offline.');
+          });
+        });
+
+        // Safety timeout in case onerror doesn't fire due to network policies
+        setTimeout(function () {
+          if (!loaded) {
+            showFallback('Timeout while loading scripts.');
+          }
+        }, 5000);
+      })();
+    </script>
+
+    <noscript>
+      <div class="fallback">
+        JavaScript is required to view these API docs. You can still open <code>jobs-api.yaml</code> directly.
+      </div>
+    </noscript>
+  </body>
+  <!-- Tip: Serve this file via a local web server (not file://) to avoid CORS issues. -->
+</html>

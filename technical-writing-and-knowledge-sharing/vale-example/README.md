@@ -5,8 +5,8 @@ A minimal, self-contained Vale setup for linting Markdown prose. It defines two 
 ## What’s included
 
 - `.vale.ini` — Configuration pointing to `Styles/` and enabling our custom style for `*.md`.
-- `Styles/HouseStyle/WeaselWords.yml` — Flags vague/weasel words like “very”, “really”, “just”, etc.
-- `Styles/HouseStyle/PassiveVoice.yml` — Heuristic check for passive voice (e.g., “was implemented”).
+- `Styles/HouseStyle/WeaselWords.yml` — Flags vague/weasel words like "very", "really", "just", etc.
+- `Styles/HouseStyle/PassiveVoice.yml` — Heuristic check for passive voice (e.g., "was implemented").
 - `docs/sample.md` — A sample with deliberate issues to exercise the rules.
 
 ## How to run (Linux)
@@ -36,10 +36,10 @@ vale .
 
 ## VS Code integration (optional)
 
-- Install the “Vale” extension (errata-ai.vale-server).
-- Open this folder; the extension will pick up `.vale.ini` and annotate issues inline.
+- Install the "Vale" extension (errata-ai.vale-server).
+- Open this folder, the extension will pick up `.vale.ini` and annotate issues inline.
 
 ## Notes
 
-- The passive voice rule is intentionally simple; it may produce false positives/negatives. For production use, prefer a maintained style (e.g., write-good) or refine the regex/rules.
+- The passive voice rule is intentionally simple, it may produce false positives/negatives. For production use, prefer a maintained style (e.g., write-good) or refine the regex/rules.
 - You can add more rules under `Styles/HouseStyle/` and list them in `.vale.ini` via `BasedOnStyles = HouseStyle` (already set for `*.md`).
