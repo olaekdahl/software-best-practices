@@ -11,18 +11,22 @@ Prereqs → Install → Run → Verify
   - Node.js (optional, for Redocly CLI to lint/build API docs)
 
 - Install
+
   ```bash
   pip install -r requirements.txt
   ```
 
 - Run the app (hot reload)
+
   ```bash
   uvicorn app:app --reload
   # App listens on http://127.0.0.1:8000 by default
   ```
+
   Note: Running `python app.py` also works, but using the import string (`uvicorn app:app --reload`) avoids a uvicorn reload warning.
 
 - Verify the API
+
   ```bash
   # Submit a job (idempotent via Idempotency-Key)
   curl -s -X POST 'http://127.0.0.1:8000/jobs' \
@@ -46,6 +50,7 @@ Prereqs → Install → Run → Verify
   ```
 
 - Generate and view Redoc docs
+
   ```bash
   # Export OpenAPI YAML (no server required)
   python3 scripts/export_openapi.py
@@ -66,6 +71,7 @@ Prereqs → Install → Run → Verify
 - App host/port
   - Defaults: 127.0.0.1:8000 (see `app.py`)
   - Override via uvicorn if needed:
+
     ```bash
     uvicorn app:app --host 0.0.0.0 --port 8000 --reload
     ```
@@ -84,6 +90,7 @@ Prereqs → Install → Run → Verify
   - `python app.py` starts uvicorn with `reload=True`
 
 - Lint API description
+
   ```bash
   npx @redocly/cli lint api-design/jobs-api.yaml
   ```
