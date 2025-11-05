@@ -1,0 +1,77 @@
+openapi: 3.1.0
+info:
+  title: Books REST API (demo)
+  version: 0.1.0
+servers:
+  - url: http://localhost:9000
+paths:
+  /rest/books:
+    get:
+      summary: List books
+      operationId: listBooks
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Book'
+    post:
+      summary: Create a book
+      operationId: createBook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewBook'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        '400':
+          description: Bad request
+  /rest/books/{id}:
+    get:
+      summary: Get a book by id
+      operationId: getBook
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        '404':
+          description: Not found
+components:
+  schemas:
+    Book:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        author:
+          type: string
+      required: [id, title, author]
+    NewBook:
+      type: object
+      properties:
+        title:
+          type: string
+        author:
+          type: string
+      required: [title, author]

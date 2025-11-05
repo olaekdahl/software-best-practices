@@ -73,3 +73,19 @@ Open `jobs-api.html` in your browser (or serve it as above).
 
 - If the UI shows an error, validate the spec with an online OpenAPI validator or a linter.
 - If the spec path changes, update the `spec-url` in `redoc.html`.
+
+## Bonus: REST vs GraphQL tiny demo (no deps)
+
+A self-contained comparison lives in `rest-graphql-demo/`:
+
+- `server.py` — minimal HTTP server exposing both REST (`/rest/...`) and GraphQL (`/graphql`)
+- `rest_openapi.yaml` — OpenAPI description of the REST surface
+- `graphql_schema.graphql` — GraphQL SDL for the same domain
+
+Run it:
+
+```bash
+cd api-design/rest-graphql-demo
+python3 server.py
+# visit http://localhost:9000
+```

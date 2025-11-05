@@ -2,3 +2,4 @@ fastapi>=0.111
 uvicorn[standard]>=0.30
 pydantic>=2.6
 PyYAML>=6.0.1
+strawberry-graphql>=0.208
