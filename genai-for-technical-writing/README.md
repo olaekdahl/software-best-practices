@@ -1,23 +1,66 @@
-# GenAI for Technical Writing
+# Widgetizer
 
-This folder contains a tiny, made-up project and a set of prompt templates you can use to generate documentation with an LLM (e.g., GitHub Copilot Chat). It includes:
-
-- A small example module (`src/widgetizer`) with docstrings
-- A few seed docs under `docs/`
-- Focused prompt templates under `prompts/`
-- A usage guide for GitHub Copilot (`github-copilot-instructions.md`)
+A tiny Python library and example used to demo AI‑assisted technical writing. Widgetizer turns small, typed objects into readable Markdown and summaries. It exists to give writers and engineers a compact, realistic target for prompt‑driven docs.
 
 ## Quick start
 
-- Explore `src/widgetizer/` and `examples/usage.py`.
-- Open `prompts/` and pick a prompt (e.g., `01-generate-readme.md`).
-- Paste a prompt into your LLM and follow the variables/placeholders.
+Install nothing. Run the example and see output:
 
-## Suggested flow
+```bash
+python3 genai-for-technical-writing/examples/usage.py
+```
 
-1. Generate a project README from code and seeds.
-2. Generate API docs from docstrings and type hints.
-3. Generate a lightweight architecture doc and diagram.
-4. Generate a changelog or release notes from git history (optional).
+Minimal usage in code:
 
-See `github-copilot-instructions.md` for tips on running prompts effectively in VS Code.
+```python
+from widgetizer import Widget, render_markdown, summarize
+
+cart = Widget(name="Cart", fields={"items": 3, "total": 59.90}, tags=["checkout", "cart"])
+print(render_markdown(cart))
+print(summarize([cart]))
+```
+
+## How it’s built
+
+- Core dataclass: `Widget` (name, fields, tags)
+- Render: `render_markdown(widget) -> str`
+- Summarize: `summarize(widgets, include_tags=True) -> str`
+
+These live in `src/widgetizer/`. Seeds in `docs/` describe purpose and architecture; `examples/usage.py` shows a runnable flow.
+
+## Data flow
+
+```mermaid
+flowchart LR
+	A[Input data\n(name, fields, tags)] --> B[Widget]
+	B --> C[render_markdown]
+	C --> D[Markdown]
+	B -. collection .-> E[summarize]
+	E --> F[One‑paragraph summary]
+```
+
+## Run the example
+
+From the repo root:
+
+```bash
+python3 genai-for-technical-writing/examples/usage.py
+```
+
+You’ll see a Markdown rendering of a widget and a short collection summary.
+
+## Generate docs with the prompts
+
+Prompts live in `genai-for-technical-writing/prompts/`:
+
+- `01-generate-readme.md`: build this README from code and seeds
+- `02-generate-api-docs.md`: produce API docs from types and docstrings
+- `03-generate-architecture-diagram.md`: create a diagram and short notes
+- `04-generate-changelog.md`, `05-generate-tests.md`: optional extras
+
+Suggested workflow:
+1) Open a prompt, fill the variables (code path, seeds, examples).
+2) Paste into your LLM (e.g., GitHub Copilot Chat in VS Code).
+3) Review and commit the generated docs.
+
+See `docs/overview.md` and `docs/architecture.md` for seed context and `github-copilot-instructions.md` for tips.

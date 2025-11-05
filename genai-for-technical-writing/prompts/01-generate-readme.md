@@ -2,9 +2,12 @@
 
 Context:
 
+- Root:{{project root}}
 - Code: {{code_root}} <!-- e.g., `src/widgetizer/` -->
 - Seeds: {{seed_docs}} <!-- e.g., `docs/overview.md`, `docs/architecture.md` -->
 - Examples: {{examples}} <!-- e.g., `examples/usage.py` -->
+- Folders to exclude: {{list of folders to exclude}}
+- Vale location: {{}}
 
 Task:
 
@@ -14,7 +17,7 @@ Task:
   - Basic architecture and how the pieces fit
   - How to run the example
   - How to generate docs using the prompts
-- Include one Mermaid diagram (optional) illustrating the simple data flow.
+- Include one Mermaid diagram illustrating the simple data flow.
 
 Constraints:
 
@@ -24,5 +27,12 @@ Constraints:
 
 Output:
 
+- Create a new README.md file if none exists or update if one is already present in root folder.
 - Markdown README content only.
 - No boilerplate badges; focus on substance.
+- If unsure, stop and ask clarifying question.
+
+Linting:
+
+- Use Vale to lint the generated README
+- Use Vale lint output and fix suggestions, warnings, and errors.
