@@ -1,0 +1,41 @@
+
+version: "3.8"
+services:
+  kafka:
+    # Bitnami images are no longer available on Docker Hub; use the official Apache Kafka image
+    image: apache/kafka:3.7.1
+    container_name: kafka
+    ports:
+      # Expose the EXTERNAL listener on host port 9092 so local apps can use localhost:9092
+      - "9092:9092"
+    environment:
+      # Single-node KRaft mode (no ZooKeeper)
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+
+      # Listeners: INTERNAL for inter-broker/inside Docker network, CONTROLLER for KRaft quorum,
+      # EXTERNAL for host access. We map EXTERNAL to 0.0.0.0:9092 and advertise localhost:9092
+      KAFKA_LISTENERS: INTERNAL://:19092,CONTROLLER://:9093,EXTERNAL://:9092
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:19092,EXTERNAL://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+
+      # Storage and cluster format
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+      # Static cluster id for local dev; the image will format storage on first run
+      CLUSTER_ID: 4L6g3nShT-eMCtK--X86sw
+
+      # Convenience for demos (use proper keys recognized by apache/kafka image)
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+
+volumes:
+  kafka_data:
