@@ -11,6 +11,9 @@ UNUSED_CONSTANT = 42  # Should be flagged by pylint (unused)
 def add(a: int, b: int) -> int:
     return a + b
 
+def add2(a: int, b: int) -> int:
+    return a + b
+
 
 def risky_divide(a: float, b: float) -> float | None:
     """Divide with intentionally broad exception (lint will complain)."""
