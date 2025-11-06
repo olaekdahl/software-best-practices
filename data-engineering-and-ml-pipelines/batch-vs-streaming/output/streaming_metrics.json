@@ -1,0 +1,8 @@
+{
+  "event_count": 4,
+  "orders": 3,
+  "refunds": 1,
+  "revenue": 44.5,
+  "last_event": "order_placed",
+  "updated_at": "2025-11-05T17:22:37.942431Z"
+}

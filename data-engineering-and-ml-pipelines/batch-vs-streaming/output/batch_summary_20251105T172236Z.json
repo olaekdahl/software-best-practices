@@ -1,0 +1,10 @@
+{
+  "generated_at": "2025-11-05T17:22:36.473167Z",
+  "order_count": 3,
+  "total_revenue": 95.4,
+  "top_customer": {
+    "customer_id": "1",
+    "total_amount": 69.9
+  },
+  "source": "ingestion-and-transformation/output/customer_order_summary.csv"
+}

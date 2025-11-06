@@ -1,0 +1,4 @@
+customer_id,name,email,region
+1,Alice Smith,alice@example.com,NA
+2,Bob Jones,unknown@example.com,EU
+3,Carol Danvers,carol@example.com,UNK

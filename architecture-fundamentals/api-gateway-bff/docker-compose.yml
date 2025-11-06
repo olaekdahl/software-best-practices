@@ -1,0 +1,46 @@
+version: "3.9"
+
+services:
+  kong:
+    image: kong:3.6
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /kong/kong.yml
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_LOG_LEVEL: debug
+      KONG_PLUGINS: bundled
+    volumes:
+      - ./kong/kong.yml:/kong/kong.yml:ro
+    ports:
+      - "8000:8000"   # proxy
+      - "8001:8001"   # admin (read-only in dbless)
+    depends_on:
+      - bff-web
+      - bff-mobile
+
+  bff-web:
+    build: ./bff/web
+    environment:
+      CATALOG_URL: http://catalog:8000
+      CART_URL: http://cart:8000
+      CHECKOUT_URL: http://checkout:8000
+    depends_on: [catalog, cart, checkout]
+
+  bff-mobile:
+    build: ./bff/mobile
+    environment:
+      CATALOG_URL: http://catalog:8000
+      CART_URL: http://cart:8000
+    depends_on: [catalog, cart]
+
+  cart:
+    build: ./services/cart
+
+  catalog:
+    build: ./services/catalog
+
+  checkout:
+    build: ./services/checkout

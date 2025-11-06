@@ -1,2 +1,34 @@
 .venv/
 __pycache__/
+
+# --- Apache Airflow (local/demo) ---
+# Common AIRFLOW_HOME directories created during local runs
+airflow_home/
+**/airflow_home/
+
+# Airflow metadata DB and config that may appear under AIRFLOW_HOME
+airflow.db
+airflow.db-journal
+airflow.cfg
+webserver_config.py
+standalone_admin_password.txt
+airflow-webserver.pid
+
+# Airflow logs under AIRFLOW_HOME
+airflow_home/logs/
+**/airflow_home/logs/
+
+# --- Prefect (local/demo) ---
+# Prefect runtime dirs if created inside the repo
+.prefect/
+**/.prefect/
+.orion/
+**/.orion/
+
+# Prefect local SQLite DB names (when using local API)
+orion.db
+orion.sqlite
+prefect.db
+
+# Prefect deployment build artifacts created by CLI
+*-deployment.yaml

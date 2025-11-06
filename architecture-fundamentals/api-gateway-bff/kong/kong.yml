@@ -1,0 +1,33 @@
+_format_version: "3.0"
+_transform: true
+
+consumers:
+- username: demo-user
+  keyauth_credentials:
+  - key: demo-key
+
+services:
+- name: bff-mobile
+  url: http://bff-mobile:8000
+  routes:
+  - name: mobile-route
+    paths:
+    - /mobile
+    strip_path: false
+    plugins:
+    - name: key-auth
+    - name: rate-limiting
+      config:
+        minute: 60
+- name: bff-web
+  url: http://bff-web:8000
+  routes:
+  - name: web-route
+    paths:
+    - /web
+    strip_path: false
+    plugins:
+    - name: key-auth
+    - name: rate-limiting
+      config:
+        minute: 60

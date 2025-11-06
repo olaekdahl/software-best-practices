@@ -1,0 +1,4 @@
+{"event_type":"order_placed","customer_id":1,"amount":9.99}
+{"event_type":"order_placed","customer_id":2,"amount":19.00}
+{"event_type":"order_refund","customer_id":1,"amount":-9.99}
+{"event_type":"order_placed","customer_id":3,"amount":25.50}
