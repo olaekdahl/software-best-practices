@@ -13,6 +13,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # ensure history is available for diffs
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -95,19 +97,49 @@ jobs:
 
       - name: Collect diff
         id: diff
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha || '' }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || '' }}
         run: |
-          git fetch origin ${{ github.base_ref }} --depth=1 || true
-          echo "FILES<<EOF" >> $GITHUB_OUTPUT
-          git diff --name-only origin/${{ github.base_ref }}...HEAD -- '*.py' >> $GITHUB_OUTPUT || true
-          echo "EOF" >> $GITHUB_OUTPUT
+          set -e
+          FILES=""
+          if [ "$EVENT_NAME" = "pull_request" ] && [ -n "$BASE_SHA" ] && [ -n "$HEAD_SHA" ]; then
+            git fetch origin "$BASE_SHA" --depth=1 || true
+            git fetch origin "$HEAD_SHA" --depth=1 || true
+            FILES=$(git diff --name-only "$BASE_SHA" "$HEAD_SHA" -- '*.py' || true)
+          else
+            if git rev-parse HEAD~1 >/dev/null 2>&1; then
+              FILES=$(git diff --name-only HEAD~1 HEAD -- '*.py' || true)
+            else
+              FILES=$(git ls-files '*.py' || true)
+            fi
+          fi
+          {
+            echo "FILES<<EOF"
+            echo "$FILES"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
       - name: AI code review (GitHub Models gpt-4o)
         if: steps.diff.outputs.FILES != ''
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha || '' }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || '' }}
         run: |
           echo "Preparing AI review..."
-          DIFF_CONTENT="$(git diff origin/${{ github.base_ref }}...HEAD -- '*.py' | sed 's/`/\\`/g' | head -c 12000)"
+          if [ "$EVENT_NAME" = "pull_request" ] && [ -n "$BASE_SHA" ] && [ -n "$HEAD_SHA" ]; then
+            DIFF_CMD=(git diff "$BASE_SHA" "$HEAD_SHA" -- '*.py')
+          else
+            if git rev-parse HEAD~1 >/dev/null 2>&1; then
+              DIFF_CMD=(git diff HEAD~1 HEAD -- '*.py')
+            else
+              DIFF_CMD=(git diff -- '*.py')
+            fi
+          fi
+          DIFF_CONTENT="$(${DIFF_CMD[@]} | sed 's/`/\`/g' | head -c 12000)"
           PROMPT="You are a code reviewer. Summarize key issues (style, complexity, potential bugs, security) from the unified diff. Provide concise, actionable suggestions and potential test additions."
           JSON_PAYLOAD=$(jq -n --arg prompt "$PROMPT" --arg diff "$DIFF_CONTENT" '{model:"gpt-4o",messages:[{role:"system",content:$prompt},{role:"user",content:$diff}]}')
           RESPONSE=$(curl -s -X POST https://api.githubcopilot.com/v1/chat/completions -H "Authorization: Bearer ${GH_TOKEN}" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2023-11-08" -d "$JSON_PAYLOAD" || true)
