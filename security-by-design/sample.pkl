@@ -1,0 +1,7 @@
+(dp0
+S'demo'
+p1
+S'pickle'
+p2
+s
+.
