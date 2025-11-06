@@ -1,0 +1,71 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Troubleshooting: Foundations",
+  "type": "debugpy",
+      "request": "launch",
+      "python": "${workspaceFolder}/.venv/bin/python",
+      "program": "${workspaceFolder}/troubleshooting-strategies/src/foundations.py",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Troubleshooting: Logs & Traces",
+  "type": "debugpy",
+      "request": "launch",
+      "python": "${workspaceFolder}/.venv/bin/python",
+      "program": "${workspaceFolder}/troubleshooting-strategies/src/logs_and_traces.py",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Troubleshooting: Debugging Tools",
+  "type": "debugpy",
+      "request": "launch",
+      "python": "${workspaceFolder}/.venv/bin/python",
+      "program": "${workspaceFolder}/troubleshooting-strategies/src/debugging_tools.py",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "env": {
+        "DEMO_DEBUG": "1"
+      }
+    },
+    {
+      "name": "Troubleshooting: Resource Monitoring",
+  "type": "debugpy",
+      "request": "launch",
+      "python": "${workspaceFolder}/.venv/bin/python",
+      "program": "${workspaceFolder}/troubleshooting-strategies/src/resource_monitoring.py",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Perf: Algorithms",
+  "type": "debugpy",
+      "request": "launch",
+      "python": "${workspaceFolder}/.venv/bin/python",
+      "program": "${workspaceFolder}/performance-considerations/src/algorithms.py",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Perf: Concurrency Demo",
+  "type": "debugpy",
+      "request": "launch",
+      "python": "${workspaceFolder}/.venv/bin/python",
+      "program": "${workspaceFolder}/performance-considerations/src/concurrency_demo.py",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Troubleshooting: Async Debug",
+	  "type": "debugpy",
+      "request": "launch",
+      "python": "${workspaceFolder}/.venv/bin/python",
+      "program": "${workspaceFolder}/troubleshooting-strategies/src/async_debug.py",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    }
+  ]
+}
