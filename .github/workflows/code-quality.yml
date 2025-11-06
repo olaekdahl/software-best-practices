@@ -133,7 +133,7 @@ jobs:
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
-      - name: AI code review (GitHub Models gpt-4o)
+      - name: AI code review (OpenAI GPT-4o)
         if: steps.diff.outputs.FILES != ''
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -142,6 +142,7 @@ jobs:
           HEAD_SHA: ${{ github.event.pull_request.head.sha || '' }}
           REPO: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.number || '' }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           echo "Preparing AI review..."
           DIFF_CONTENT=""
@@ -171,10 +172,9 @@ jobs:
           PROMPT="You are a code reviewer. Summarize key issues (style, complexity, potential bugs, security) from the unified diff. Provide concise, actionable suggestions and potential test additions. If security concerns exist call them out." 
           JSON_PAYLOAD=$(jq -n --arg prompt "$PROMPT" --arg diff "$DIFF_CONTENT" '{model:"gpt-4o",temperature:0.2,messages:[{role:"system",content:$prompt},{role:"user",content:$diff}]}')
           echo "$JSON_PAYLOAD" > ai_request.json
-          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST https://api.githubcopilot.com/v1/chat/completions \
-            -H "Authorization: Bearer ${GH_TOKEN}" \
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST https://api.openai.com/v1/chat/completions \
+            -H "Authorization: Bearer ${OPENAI_API_KEY}" \
             -H "Content-Type: application/json" \
-            -H "X-GitHub-Api-Version: 2023-11-08" \
             -d "$JSON_PAYLOAD" || true)
           HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
           BODY=$(echo "$RESPONSE" | sed '$d')
