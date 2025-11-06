@@ -7,6 +7,11 @@ on:
       - '**/*.py'
       - 'code-quality-tools/**'
 
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
 jobs:
   quality:
     runs-on: ubuntu-latest
@@ -142,6 +147,7 @@ jobs:
           HEAD_SHA: ${{ github.event.pull_request.head.sha || '' }}
           REPO: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.number || '' }}
+          PR_FORK: ${{ github.event.pull_request.head.repo.fork || false }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           echo "Preparing AI review..."
@@ -188,7 +194,30 @@ jobs:
           fi
           echo "$REVIEW" > ai_review.txt
           COMMENT_BODY=$(jq -n --arg body "### AI Code Review\n$REVIEW" '{body:$body}')
-          curl -s -X POST -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.number }}/comments -d "$COMMENT_BODY" || true
+          CAN_COMMENT="false"
+          if [ "$EVENT_NAME" = "pull_request" ] && [ "$PR_FORK" != "true" ]; then
+            CAN_COMMENT="true"
+          fi
+          if [ "$CAN_COMMENT" = "true" ]; then
+            CRESP=$(curl -s -w "\n%{http_code}" -X POST -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" \
+              https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.number }}/comments -d "$COMMENT_BODY" || true)
+            CHTTP=$(echo "$CRESP" | tail -n1)
+            if [ "$CHTTP" -ge 400 ]; then
+              echo "Comment post returned $CHTTP; writing to job summary instead."
+              {
+                echo "### AI Code Review"
+                echo ""
+                echo "$REVIEW"
+              } >> "$GITHUB_STEP_SUMMARY"
+            fi
+          else
+            echo "Insufficient permissions to comment on PR (likely a fork). Writing to job summary."
+            {
+              echo "### AI Code Review"
+              echo ""
+              echo "$REVIEW"
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
       - name: Upload AI artifacts
         if: always()
         uses: actions/upload-artifact@v4
