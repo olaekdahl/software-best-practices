@@ -140,9 +140,36 @@ jobs:
             fi
           fi
           DIFF_CONTENT="$(${DIFF_CMD[@]} | sed 's/`/\`/g' | head -c 12000)"
-          PROMPT="You are a code reviewer. Summarize key issues (style, complexity, potential bugs, security) from the unified diff. Provide concise, actionable suggestions and potential test additions."
-          JSON_PAYLOAD=$(jq -n --arg prompt "$PROMPT" --arg diff "$DIFF_CONTENT" '{model:"gpt-4o",messages:[{role:"system",content:$prompt},{role:"user",content:$diff}]}')
-          RESPONSE=$(curl -s -X POST https://api.githubcopilot.com/v1/chat/completions -H "Authorization: Bearer ${GH_TOKEN}" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2023-11-08" -d "$JSON_PAYLOAD" || true)
-          REVIEW=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // "(AI review unavailable – GitHub Models may not be enabled)"')
+          if [ -z "$DIFF_CONTENT" ]; then
+            echo "No diff content captured; skipping AI review." && exit 0
+          fi
+          PROMPT="You are a code reviewer. Summarize key issues (style, complexity, potential bugs, security) from the unified diff. Provide concise, actionable suggestions and potential test additions. If security concerns exist call them out." 
+          JSON_PAYLOAD=$(jq -n --arg prompt "$PROMPT" --arg diff "$DIFF_CONTENT" '{model:"gpt-4o",temperature:0.2,messages:[{role:"system",content:$prompt},{role:"user",content:$diff}]}')
+          echo "$JSON_PAYLOAD" > ai_request.json
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST https://api.githubcopilot.com/v1/chat/completions \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -H "X-GitHub-Api-Version: 2023-11-08" \
+            -d "$JSON_PAYLOAD" || true)
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
+          echo "$BODY" > ai_response_raw.json
+          echo "HTTP status: $HTTP_CODE"
+          if [ "$HTTP_CODE" -ge 400 ] || ! echo "$BODY" | jq -e '.choices[0].message.content' >/dev/null 2>&1; then
+            echo "AI response invalid or error (status $HTTP_CODE). Falling back." 
+            REVIEW="(AI review unavailable - status $HTTP_CODE or malformed response)"
+          else
+            REVIEW=$(echo "$BODY" | jq -r '.choices[0].message.content')
+          fi
+          echo "$REVIEW" > ai_review.txt
           COMMENT_BODY=$(jq -n --arg body "### AI Code Review\n$REVIEW" '{body:$body}')
           curl -s -X POST -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.number }}/comments -d "$COMMENT_BODY" || true
+      - name: Upload AI artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-review
+          path: |
+            ai_request.json
+            ai_response_raw.json
+            ai_review.txt
