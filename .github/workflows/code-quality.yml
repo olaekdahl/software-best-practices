@@ -101,13 +101,25 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           BASE_SHA: ${{ github.event.pull_request.base.sha || '' }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha || '' }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.number || '' }}
         run: |
           set -e
           FILES=""
-          if [ "$EVENT_NAME" = "pull_request" ] && [ -n "$BASE_SHA" ] && [ -n "$HEAD_SHA" ]; then
-            git fetch origin "$BASE_SHA" --depth=1 || true
-            git fetch origin "$HEAD_SHA" --depth=1 || true
-            FILES=$(git diff --name-only "$BASE_SHA" "$HEAD_SHA" -- '*.py' || true)
+          if [ "$EVENT_NAME" = "pull_request" ] && [ -n "$PR_NUMBER" ]; then
+            echo "Collecting changed files via GitHub API for PR #$PR_NUMBER" 
+            API_URL="https://api.github.com/repos/$REPO/pulls/$PR_NUMBER/files?per_page=100"
+            RESP=$(curl -s -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" "$API_URL" || echo "[]")
+            if echo "$RESP" | jq -e type >/dev/null 2>&1; then
+              FILES=$(echo "$RESP" | jq -r '.[] | select(.filename|endswith(".py")) | .filename' | sort -u)
+            fi
+            if [ -z "$FILES" ] && [ -n "$BASE_SHA" ] && [ -n "$HEAD_SHA" ]; then
+              echo "API returned no .py changes; falling back to git diff between SHAs"
+              git fetch --no-tags --depth=1 origin "$BASE_SHA" || true
+              git fetch --no-tags --depth=1 origin "$HEAD_SHA" || true
+              FILES=$(git diff --name-only "$BASE_SHA" "$HEAD_SHA" -- '*.py' || true)
+            fi
           else
             if git rev-parse HEAD~1 >/dev/null 2>&1; then
               FILES=$(git diff --name-only HEAD~1 HEAD -- '*.py' || true)
@@ -128,18 +140,31 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           BASE_SHA: ${{ github.event.pull_request.base.sha || '' }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha || '' }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.number || '' }}
         run: |
           echo "Preparing AI review..."
-          if [ "$EVENT_NAME" = "pull_request" ] && [ -n "$BASE_SHA" ] && [ -n "$HEAD_SHA" ]; then
-            DIFF_CMD=(git diff "$BASE_SHA" "$HEAD_SHA" -- '*.py')
-          else
-            if git rev-parse HEAD~1 >/dev/null 2>&1; then
-              DIFF_CMD=(git diff HEAD~1 HEAD -- '*.py')
-            else
-              DIFF_CMD=(git diff -- '*.py')
+          DIFF_CONTENT=""
+          if [ "$EVENT_NAME" = "pull_request" ] && [ -n "$PR_NUMBER" ]; then
+            API_URL="https://api.github.com/repos/$REPO/pulls/$PR_NUMBER/files?per_page=100"
+            RESP=$(curl -s -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" "$API_URL" || echo "[]")
+            if echo "$RESP" | jq -e type >/dev/null 2>&1; then
+              DIFF_CONTENT=$(echo "$RESP" | jq -r '.[] | select(.filename|endswith(".py")) | "File: \(.filename)\n\(.patch // "")\n"' | sed 's/`/\`/g' | head -c 12000)
             fi
           fi
-          DIFF_CONTENT="$(${DIFF_CMD[@]} | sed 's/`/\`/g' | head -c 12000)"
+          if [ -z "$DIFF_CONTENT" ]; then
+            echo "Falling back to git diff for diff content"
+            if [ "$EVENT_NAME" = "pull_request" ] && [ -n "$BASE_SHA" ] && [ -n "$HEAD_SHA" ]; then
+              DIFF_CMD=(git diff "$BASE_SHA" "$HEAD_SHA" -- '*.py')
+            else
+              if git rev-parse HEAD~1 >/dev/null 2>&1; then
+                DIFF_CMD=(git diff HEAD~1 HEAD -- '*.py')
+              else
+                DIFF_CMD=(git diff -- '*.py')
+              fi
+            fi
+            DIFF_CONTENT="$(${DIFF_CMD[@]} | sed 's/`/\`/g' | head -c 12000)"
+          fi
           if [ -z "$DIFF_CONTENT" ]; then
             echo "No diff content captured; skipping AI review." && exit 0
           fi
