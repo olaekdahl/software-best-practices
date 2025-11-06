@@ -1,0 +1,10 @@
+# Minimal Bandit configuration for demo purposes
+skips: []
+profiles:
+  default:
+    include:
+      - B101  # assert_used
+      - B110  # try_except_pass
+      - B301  # pickle
+      - B303  # md5
+      - B602  # subprocess_popen

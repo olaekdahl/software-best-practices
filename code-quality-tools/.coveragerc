@@ -1,0 +1,7 @@
+[run]
+branch = True
+source = code-quality-tools/src
+
+[report]
+exclude_lines =
+    if __name__ == .__main__.:  # exclude script entrypoints
