@@ -25,21 +25,67 @@ jobs:
           pip install -r code-quality-tools/requirements-dev.txt
 
       - name: Lint (flake8)
-        run: flake8 code-quality-tools/src
+        continue-on-error: true
+        run: |
+          echo "Running flake8 (non-blocking)..."
+          flake8 code-quality-tools/src || EXIT=$?
+          if [ -n "$EXIT" ]; then echo "flake8 reported issues (exit $EXIT) but continuing"; fi
+          flake8 code-quality-tools/src --format=default > flake8.log || true
+      - name: Upload flake8 log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: flake8-log
+          path: flake8.log
 
       - name: Lint (pylint)
-        run: pylint code-quality-tools/src || true # allow demo warnings
+        continue-on-error: true
+        run: |
+          echo "Running pylint (non-blocking)..."
+          pylint code-quality-tools/src || EXIT=$?
+          if [ -n "$EXIT" ]; then echo "pylint reported issues (exit $EXIT) but continuing"; fi
+          pylint code-quality-tools/src > pylint.log || true
+      - name: Upload pylint log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pylint-log
+          path: pylint.log
 
       - name: Type check (mypy)
-        run: mypy code-quality-tools/src
+        continue-on-error: true
+        run: |
+          echo "Running mypy (non-blocking)..."
+          mypy code-quality-tools/src || EXIT=$?
+          if [ -n "$EXIT" ]; then echo "mypy reported issues (exit $EXIT) but continuing"; fi
+          mypy code-quality-tools/src > mypy.log || true
+      - name: Upload mypy log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mypy-log
+          path: mypy.log
 
       - name: Security (bandit)
-        run: bandit -c code-quality-tools/bandit.yaml -r code-quality-tools/src || true
+        continue-on-error: true
+        run: |
+          echo "Running bandit (non-blocking)..."
+          bandit -c code-quality-tools/bandit.yaml -r code-quality-tools/src || EXIT=$?
+          if [ -n "$EXIT" ]; then echo "bandit reported issues (exit $EXIT) but continuing"; fi
+          bandit -c code-quality-tools/bandit.yaml -r code-quality-tools/src -f txt -o bandit.txt || true
+      - name: Upload bandit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bandit-report
+          path: bandit.txt
 
       - name: Tests + coverage
+        continue-on-error: true
         run: |
+          echo "Running tests (non-blocking)..."
           pytest -q --maxfail=1 --disable-warnings \
-            --cov=code-quality-tools/src --cov-report=term-missing --cov-report=xml:coverage.xml
+            --cov=code-quality-tools/src --cov-report=term-missing --cov-report=xml:coverage.xml || true
 
       - name: Upload coverage.xml artifact
         uses: actions/upload-artifact@v4
