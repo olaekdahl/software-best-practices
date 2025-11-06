@@ -1,0 +1,18 @@
+PUT /users/123
+
+{
+    id: 123,
+    name: Ola,
+    email: ola@ciracon.com,
+    role: admin
+}
+
+PATCH /users/123
+
+{
+    email: ola@ciracon.com
+}
+
+
+GET /users/?state=ca&gender&male&foo=bar
+
