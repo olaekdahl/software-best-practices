@@ -45,12 +45,12 @@ make -C troubleshooting-strategies demo-async
 
 ## Contents
 
-- `src/foundations.py` – step‑by‑step reproduce→isolate→identify→fix→verify with pitfalls explained
-- `src/logs_and_traces.py` – logging configuration, stack traces, and how to interpret them
-- `src/debugging_tools.py` – logging levels, assertions, optional breakpoint hook (no blocking by default)
-- `src/resource_monitoring.py` – CPU/memory/network sampling with psutil when available, otherwise /proc
-- `src/resource_monitoring.py` – CPU/memory/network sampling with psutil when available, otherwise /proc
-- `src/async_debug.py` – enumerate tasks, inspect their stacks, structured async exception handling
+- `src/foundations.py` - step‑by‑step reproduce→isolate→identify→fix→verify with pitfalls explained
+- `src/logs_and_traces.py` - logging configuration, stack traces, and how to interpret them
+- `src/debugging_tools.py` - logging levels, assertions, optional breakpoint hook (no blocking by default)
+- `src/resource_monitoring.py` - CPU/memory/network sampling with psutil when available, otherwise /proc
+- `src/resource_monitoring.py` - CPU/memory/network sampling with psutil when available, otherwise /proc
+- `src/async_debug.py` - enumerate tasks, inspect their stacks, structured async exception handling
 
 Pro tip: Always measure and make one change at a time; verify the effect before moving on.
 

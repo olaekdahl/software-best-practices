@@ -41,11 +41,11 @@ make -C security-by-design demo-validate
 
 ## Folder layout
 
-- `src/app.py` – FastAPI app with XSS safe/unsafe, login, and RBAC-protected endpoint; SQL search safe/unsafe
-- `src/config_insecure.py` vs `src/config_secure.py` – secrets and error handling patterns
-- `src/sql_injection_vulnerable.py` and `src/sql_injection_safe.py` – SQLite demos
-- `src/insecure_deserialization.py` and `src/safe_deserialization.py` – pickle vs JSON+pydantic
-- `src/input_validation.py` – sanitization and validation helpers
+- `src/app.py` - FastAPI app with XSS safe/unsafe, login, and RBAC-protected endpoint; SQL search safe/unsafe
+- `src/config_insecure.py` vs `src/config_secure.py` - secrets and error handling patterns
+- `src/sql_injection_vulnerable.py` and `src/sql_injection_safe.py` - SQLite demos
+- `src/insecure_deserialization.py` and `src/safe_deserialization.py` - pickle vs JSON+pydantic
+- `src/input_validation.py` - sanitization and validation helpers
 
 ## Key practices (cheat sheet)
 

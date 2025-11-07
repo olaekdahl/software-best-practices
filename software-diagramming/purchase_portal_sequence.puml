@@ -1,5 +1,5 @@
 @startuml
-title Purchase Portal – Submit Order Flow
+title Purchase Portal - Submit Order Flow
 
 actor Parent
 ... AI Chatbot suggests order tracking ...

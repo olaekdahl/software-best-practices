@@ -7,9 +7,9 @@ Context:
 
 Task:
 
-- Produce a short architecture note (200–300 words) summarizing components and data flow.
+- Produce a short architecture note (200-300 words) summarizing components and data flow.
 - Include one Mermaid diagram (flowchart or sequence) illustrating key interactions.
-- If helpful, list 2–3 assumptions explicitly.
+- If helpful, list 2-3 assumptions explicitly.
 
 Constraints:
 

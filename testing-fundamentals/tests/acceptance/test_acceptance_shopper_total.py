@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-"""Acceptance-style test (Given–When–Then) for a simple shopping total.
+"""Acceptance-style test (Given-When-Then) for a simple shopping total.
 
 Scenario: As a shopper, I want to see my total with tax so that I know what I pay.
 Given a unit price and quantity

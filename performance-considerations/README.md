@@ -36,12 +36,12 @@ make -C performance-considerations demo-db
 
 ## Folder layout
 
-- `src/algorithms.py` – micro-benchmarks: set vs list membership, top-k via heap, two-sum O(n^2) vs O(n)
-- `src/pitfalls.py` – excessive I/O, memory growth pattern, repeated work, blocking calls
-- `src/profiling.py` – cProfile + pstats, timeit, tracemalloc examples
-- `src/optimization.py` – caching with lru_cache, lazy file streaming vs eager load
-- `src/concurrency_demo.py` – IO-bound with threads, CPU-bound with processes
-- `src/db_queries.py` – SQLite N+1 queries vs single JOIN/GROUP BY
+- `src/algorithms.py` - micro-benchmarks: set vs list membership, top-k via heap, two-sum O(n^2) vs O(n)
+- `src/pitfalls.py` - excessive I/O, memory growth pattern, repeated work, blocking calls
+- `src/profiling.py` - cProfile + pstats, timeit, tracemalloc examples
+- `src/optimization.py` - caching with lru_cache, lazy file streaming vs eager load
+- `src/concurrency_demo.py` - IO-bound with threads, CPU-bound with processes
+- `src/db_queries.py` - SQLite N+1 queries vs single JOIN/GROUP BY
 
 Tips:
 

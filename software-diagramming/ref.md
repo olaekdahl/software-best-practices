@@ -1,4 +1,4 @@
-# Software Diagramming Quick Reference – Mermaid & PlantUML
+# Software Diagramming Quick Reference - Mermaid & PlantUML
 
 Purpose: paste, tweak, and render the most common diagram types in Markdown (Mermaid) and PlantUML. Use VS Code’s Markdown preview for Mermaid; use a PlantUML extension for PlantUML.
 

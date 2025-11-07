@@ -3,7 +3,8 @@ from __future__ import annotations
 from importlib.util import spec_from_file_location, module_from_spec
 from pathlib import Path
 
-SRC = Path(__file__).resolve().parents[3] / "src" / "calculator.py"
+# Use the testing-fundamentals/src folder (not repo root src)
+SRC = Path(__file__).resolve().parents[2] / "src" / "calculator.py"
 spec = spec_from_file_location("calculator", SRC)
 assert spec and spec.loader
 mod = module_from_spec(spec)

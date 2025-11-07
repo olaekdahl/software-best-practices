@@ -11,4 +11,4 @@ Goal: uncover issues that scripted tests may miss.
 - Risks:
   - Silent data loss, incorrect rounding, timezone shifts.
 - Exit:
-  - 30–45 minutes or 3 significant findings.
+  - 30-45 minutes or 3 significant findings.
