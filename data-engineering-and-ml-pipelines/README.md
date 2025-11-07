@@ -20,7 +20,7 @@ See each subfolder for scripts and usage notes below.
 - Batch job:
   - `python3 data-engineering-and-ml-pipelines/batch-vs-streaming/batch_pipeline.py`
 - Streaming job (simulated):
-  - `python3 data-engineering-and-ml-pipelines/batch-vs-streaming/streaming_pipeline.py`
+  - `python3 data-engineering-and-ml-pipelines/batch-vs-streaming/streaming_pipeline.py --poll-interval 0.5 --pattern "events*.jsonl"`
 - Train model and serve predictions:
   - `python3 data-engineering-and-ml-pipelines/ml-pipeline/train_model.py`
   - `uvicorn data-engineering-and-ml-pipelines/ml-pipeline.serve_model:app --reload`
