@@ -1,0 +1,4 @@
+Critical: 100%
+Business logic: 85%-90%
+External glue: Mock all dependencies - 60%, primarily setters.
+Vendor: 0%

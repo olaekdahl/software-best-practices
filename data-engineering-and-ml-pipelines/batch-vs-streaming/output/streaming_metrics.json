@@ -1,8 +1,8 @@
 {
-  "event_count": 4,
-  "orders": 3,
-  "refunds": 1,
-  "revenue": 44.5,
+  "event_count": 12,
+  "orders": 9,
+  "refunds": 3,
+  "revenue": 133.5,
   "last_event": "order_placed",
-  "updated_at": "2025-11-07T00:39:48.080312Z"
+  "updated_at": "2025-11-07T13:59:29.290153Z"
 }
