@@ -13,7 +13,7 @@ batch: ingest
 	$(PY) batch-vs-streaming/batch_pipeline.py
 
 stream:
-	$(PY) batch-vs-streaming/streaming_pipeline.py
+	$(PY) batch-vs-streaming/streaming_pipeline.py --poll-interval 0.5 --pattern "events*.jsonl"
 
 orchestrate:
 	$(PY) orchestration/simple_orchestrator.py
@@ -22,7 +22,7 @@ train:
 	$(PY) ml-pipeline/train_model.py
 
 serve:
-	$(UVICORN) ml-pipeline.serve_model:app --reload
+	$(UVICORN) serve_model:app --reload --app-dir ml-pipeline
 
 # --- Airflow helpers (optional) ---
 AIRFLOW ?= airflow

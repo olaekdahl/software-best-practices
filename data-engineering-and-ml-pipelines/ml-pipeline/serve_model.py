@@ -1,7 +1,7 @@
 """Serve a trained model with FastAPI.
 
-Start:
-  uvicorn data-engineering-and-ml-pipelines/ml-pipeline.serve_model:app --reload
+Start (from repo root):
+    uvicorn serve_model:app --reload --app-dir data-engineering-and-ml-pipelines/ml-pipeline
 """
 
 from __future__ import annotations
