@@ -1,0 +1,88 @@
+@startuml design-patterns
+skinparam defaultFontName Arial
+skinparam shadowing false
+skinparam ArrowColor #34495E
+skinparam RectangleBorderColor #34495E
+skinparam noteBackgroundColor #FDF2E9
+skinparam noteBorderColor #D35400
+
+title Design Patterns - Class Relationships
+
+package "Strategy Pattern" #E8F8F5 {
+  interface DiscountStrategy {
+    + calculate(order: Order): float
+  }
+
+  class PercentageDiscount {
+    - rate: float
+    + calculate(order: Order): float
+  }
+
+  class BulkDiscount {
+    - threshold: int
+    - rate: float
+    + calculate(order: Order): float
+  }
+
+  class SeasonalDiscount {
+    - start_date: date
+    - end_date: date
+    - rate: float
+    + calculate(order: Order): float
+  }
+
+  class PricingService {
+    - strategy: DiscountStrategy
+    + set_strategy(s: DiscountStrategy): void
+    + apply_discount(order: Order): float
+  }
+
+  PercentageDiscount ..|> DiscountStrategy
+  BulkDiscount ..|> DiscountStrategy
+  SeasonalDiscount ..|> DiscountStrategy
+  PricingService --> DiscountStrategy : uses
+}
+
+package "Observer Pattern" #EBF5FB {
+  interface OrderObserver {
+    + on_order_event(event: OrderEvent): void
+  }
+
+  class InventoryUpdater {
+    + on_order_event(event: OrderEvent): void
+  }
+
+  class EmailNotifier {
+    + on_order_event(event: OrderEvent): void
+  }
+
+  class AuditLogger {
+    + on_order_event(event: OrderEvent): void
+  }
+
+  class OrderEventBus {
+    - observers: list[OrderObserver]
+    + subscribe(obs: OrderObserver): void
+    + publish(event: OrderEvent): void
+  }
+
+  InventoryUpdater ..|> OrderObserver
+  EmailNotifier ..|> OrderObserver
+  AuditLogger ..|> OrderObserver
+  OrderEventBus --> OrderObserver : notifies
+}
+
+note bottom of DiscountStrategy
+  Open/Closed Principle:
+  add new discounts
+  without modifying
+  PricingService
+end note
+
+note bottom of OrderObserver
+  Loose coupling:
+  OrderEventBus does not
+  know concrete observers
+end note
+
+@enduml

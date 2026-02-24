@@ -1,0 +1,68 @@
+@startuml modular-architecture
+skinparam defaultFontName Arial
+skinparam shadowing false
+skinparam ArrowColor #34495E
+skinparam RectangleBorderColor #34495E
+skinparam packageBorderColor #34495E
+skinparam componentStyle rectangle
+
+title Modular Architecture - Order Processing System
+footer Shows clean separation of concerns with Dependency Inversion
+
+package "Presentation Layer" #E8F8F5 {
+  [REST API Controller] as api
+  [CLI Interface] as cli
+  [Event Consumer] as consumer
+}
+
+package "Application Layer" #EBF5FB {
+  [SubmitOrderUseCase] as submit
+  [ConfirmOrderUseCase] as confirm
+  [ShipOrderUseCase] as ship
+  [CancelOrderUseCase] as cancel
+}
+
+package "Domain Layer" #F5EEF8 {
+  [Order] as order
+  [OrderItem] as item
+  [OrderStatus] as status
+  [OrderRepository <<interface>>] as repo_iface
+  [PaymentGateway <<interface>>] as pay_iface
+  [NotificationService <<interface>>] as notify_iface
+}
+
+package "Infrastructure Layer" #FDF2E9 {
+  [PostgresOrderRepository] as pg_repo
+  [StripePaymentGateway] as stripe
+  [EmailNotificationService] as email
+  [RabbitMQPublisher] as rabbit
+}
+
+api --> submit
+api --> confirm
+cli --> cancel
+consumer --> ship
+
+submit --> order
+submit --> repo_iface
+submit --> pay_iface
+confirm --> order
+confirm --> notify_iface
+ship --> order
+cancel --> order
+
+pg_repo ..|> repo_iface : implements
+stripe ..|> pay_iface : implements
+email ..|> notify_iface : implements
+
+order --> item
+order --> status
+
+note right of repo_iface
+  Domain defines interfaces.
+  Infrastructure provides
+  concrete implementations.
+  This is Dependency Inversion.
+end note
+
+@enduml

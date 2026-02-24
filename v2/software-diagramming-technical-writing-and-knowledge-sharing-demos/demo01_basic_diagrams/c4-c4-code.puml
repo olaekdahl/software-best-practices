@@ -1,0 +1,55 @@
+@startuml c4_code
+skinparam defaultFontName Arial
+skinparam shadowing false
+skinparam ArrowColor #34495E
+skinparam RectangleBorderColor #34495E
+
+title C4 - Code: Order Service
+
+interface OrderPort {
+  + create_order(items): Order
+  + get_order(order_id): Order
+}
+
+class OrderService {
+  - repo: OrderRepository
+  - payments: PaymentPort
+  + create_order(items): Order
+  + get_order(order_id): Order
+}
+
+interface PaymentPort {
+  + charge(amount, token): TxnResult
+}
+
+interface OrderRepository {
+  + save(order): None
+  + find_by_id(id): Order
+}
+
+class Order {
+  + id: str
+  + items: list[Item]
+  + status: str
+  + total: float
+}
+
+class Item {
+  + sku: str
+  + name: str
+  + price: float
+  + qty: int
+}
+
+OrderService ..|> OrderPort
+OrderService --> PaymentPort : uses
+OrderService --> OrderRepository : uses
+OrderService --> Order : creates
+Order *-- Item : contains
+
+note right of OrderService
+  This is the code-level view.
+  Rarely maintained manually -
+  IDEs and tools do this better.
+end note
+@enduml

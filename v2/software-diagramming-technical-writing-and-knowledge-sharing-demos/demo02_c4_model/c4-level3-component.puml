@@ -1,0 +1,78 @@
+@startuml c4_level3_component
+skinparam defaultFontName Arial
+skinparam shadowing false
+skinparam ArrowColor #34495E
+skinparam RectangleBorderColor #34495E
+skinparam noteBackgroundColor #FDF2E9
+skinparam noteBorderColor #D35400
+
+title C4 Level 3 - Components: Order Service
+
+rectangle "API Gateway" as gateway #LightGray
+
+rectangle "Order Service [Python/FastAPI]" {
+
+    ' --- API layer (Blue) ---
+    rectangle "Order Router\n[FastAPI Router]\n\nHTTP endpoints for\norder CRUD operations" as router #LightBlue
+
+    rectangle "Middleware\n[FastAPI Middleware]\n\nRequest validation,\nerror handling,\ncorrelation IDs" as middleware #LightBlue
+
+    ' --- Application layer (Green) ---
+    rectangle "Create Order\n[Use Case]\n\nValidates items,\nreserves inventory,\ncreates draft order" as uc_create #LightGreen
+
+    rectangle "Submit Order\n[Use Case]\n\nProcesses payment,\nconfirms order,\npublishes event" as uc_submit #LightGreen
+
+    rectangle "Cancel Order\n[Use Case]\n\nValidates cancellation\nwindow, issues refund,\nreleases inventory" as uc_cancel #LightGreen
+
+    rectangle "Query Orders\n[Use Case]\n\nPaginated listing,\nfiltering, sorting,\ncursor-based pagination" as uc_query #LightGreen
+
+    ' --- Domain layer (Yellow) ---
+    rectangle "Order Aggregate\n[Domain Entity]\n\nOrder entity with\nstate machine,\nbusiness rules,\nvalue objects" as domain #Yellow
+
+    ' --- Infrastructure adapters (Orange) ---
+    rectangle "Order Repository\n[SQLAlchemy]\n\nPostgreSQL ORM,\nquery builders,\ntransaction management" as repo #Orange
+
+    rectangle "Payment Adapter\n[Stripe SDK]\n\nStripe API wrapper,\nidempotency keys,\nretry logic" as payment_adapter #Orange
+
+    rectangle "Inventory Client\n[HTTP Client]\n\nReservation and\nrelease calls to\nInventory Service" as inventory_client #Orange
+
+    rectangle "Event Publisher\n[RabbitMQ]\n\nOutbox pattern,\nat-least-once delivery,\nevent serialization" as events #Orange
+}
+
+database "Order DB\n[PostgreSQL]" as db
+queue "Event Bus\n[RabbitMQ]" as mq
+rectangle "Stripe" as stripe #LightGray
+rectangle "Inventory Service" as inv_svc #LightGray
+
+' --- Relationships ---
+gateway --> middleware : HTTP
+middleware --> router : HTTP
+router --> uc_create
+router --> uc_submit
+router --> uc_cancel
+router --> uc_query
+uc_create --> domain
+uc_submit --> domain
+uc_cancel --> domain
+uc_query --> repo
+uc_create --> repo
+uc_submit --> repo
+uc_submit --> payment_adapter
+uc_submit --> events
+uc_cancel --> repo
+uc_cancel --> payment_adapter
+uc_cancel --> events
+uc_create --> inventory_client
+uc_cancel --> inventory_client
+repo --> db : SQL
+events --> mq : AMQP
+payment_adapter --> stripe : HTTPS
+inventory_client --> inv_svc : HTTP
+
+note bottom of domain
+  Domain layer has no
+  dependencies on infrastructure.
+  Pure business logic (DIP).
+end note
+
+@enduml

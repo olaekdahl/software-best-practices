@@ -1,0 +1,43 @@
+@startuml order_states
+skinparam defaultFontName Arial
+skinparam shadowing false
+skinparam ArrowColor #34495E
+skinparam RectangleBorderColor #34495E
+
+title Order State Machine
+
+[*] --> Draft : create()
+
+Draft --> Submitted : submit()\n[has items]
+Draft --> Cancelled : cancel()
+Draft : Customer adds/removes items
+Draft : No payment yet
+
+Submitted --> Confirmed : confirm()\n[payment OK]
+Submitted --> Failed : confirm()\n[payment failed]
+Submitted --> Cancelled : cancel()\n[within 30 min]
+Submitted : Awaiting payment
+
+Confirmed --> Shipped : ship()\n[tracking number assigned]
+Confirmed --> Cancelled : cancel()\n[within 1 hour]
+Confirmed : Payment captured
+Confirmed : Inventory reserved
+
+Shipped --> Delivered : deliver()
+Shipped --> Returned : return_request()
+Shipped : In transit
+Shipped : Customer can track
+
+Delivered --> [*]
+Delivered : Complete
+
+Failed --> [*]
+Failed : Payment declined
+
+Cancelled --> [*]
+Cancelled : Refund issued if paid
+
+Returned --> Refunded : process_return()
+Refunded --> [*]
+
+@enduml

@@ -1,0 +1,83 @@
+{
+  "version": 1,
+  "disable_existing_loggers": false,
+  "formatters": {
+    "json": {
+      "()": "pythonjsonlogger.jsonlogger.JsonFormatter",
+      "format": "%(asctime)s %(name)s %(levelname)s %(message)s",
+      "datefmt": "%Y-%m-%dT%H:%M:%S%z",
+      "rename_fields": {
+        "asctime": "timestamp",
+        "levelname": "level",
+        "name": "logger"
+      },
+      "static_fields": {
+        "service": "order-service",
+        "environment": "production"
+      }
+    },
+    "console": {
+      "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+    }
+  },
+  "filters": {
+    "sensitive_data": {
+      "()": "app.logging.SensitiveDataFilter",
+      "patterns": [
+        "password",
+        "token",
+        "secret",
+        "api_key",
+        "ssn",
+        "credit_card"
+      ]
+    }
+  },
+  "handlers": {
+    "console": {
+      "class": "logging.StreamHandler",
+      "level": "INFO",
+      "formatter": "console",
+      "stream": "ext://sys.stdout"
+    },
+    "json_file": {
+      "class": "logging.handlers.RotatingFileHandler",
+      "level": "INFO",
+      "formatter": "json",
+      "filters": ["sensitive_data"],
+      "filename": "logs/app.log",
+      "maxBytes": 10485760,
+      "backupCount": 5
+    },
+    "error_file": {
+      "class": "logging.handlers.RotatingFileHandler",
+      "level": "ERROR",
+      "formatter": "json",
+      "filters": ["sensitive_data"],
+      "filename": "logs/error.log",
+      "maxBytes": 10485760,
+      "backupCount": 10
+    }
+  },
+  "loggers": {
+    "app": {
+      "level": "INFO",
+      "handlers": ["console", "json_file", "error_file"],
+      "propagate": false
+    },
+    "uvicorn": {
+      "level": "WARNING",
+      "handlers": ["console", "json_file"],
+      "propagate": false
+    },
+    "sqlalchemy.engine": {
+      "level": "WARNING",
+      "handlers": ["json_file"],
+      "propagate": false
+    }
+  },
+  "root": {
+    "level": "WARNING",
+    "handlers": ["console", "json_file"]
+  }
+}

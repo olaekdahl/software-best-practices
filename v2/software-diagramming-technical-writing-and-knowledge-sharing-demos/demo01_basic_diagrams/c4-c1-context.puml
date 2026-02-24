@@ -1,0 +1,25 @@
+@startuml c1_system_context
+skinparam defaultFontName Arial
+skinparam shadowing false
+skinparam ArrowColor #34495E
+skinparam RectangleBorderColor #34495E
+
+title C1 - System Context: Online Bookstore
+
+actor "Customer" as cust
+actor "Admin" as admin
+
+rectangle "Online Bookstore\n[Software System]" as bookstore #LightBlue
+rectangle "Payment Provider\n[External System]" as payment #LightGray
+rectangle "Email Service\n[External System]" as email #LightGray
+
+cust --> bookstore : Browses catalog,\nplaces orders
+admin --> bookstore : Manages inventory,\nviews reports
+bookstore --> payment : Processes payments
+bookstore --> email : Sends order confirmations
+
+note right of bookstore
+  The system we are building.
+  Everything else is external.
+end note
+@enduml

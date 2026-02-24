@@ -1,0 +1,36 @@
+%%{init: {'theme': 'neutral'}}%%
+graph TB
+    subgraph ext [External Users]
+        customer["Customer<br/><i>Browses and buys products</i>"]
+        seller["Seller<br/><i>Lists products, manages inventory</i>"]
+        admin["Admin<br/><i>Platform management</i>"]
+    end
+
+    subgraph sys ["Online Marketplace<br/>[Software System]"]
+        marketplace["Marketplace Platform<br/><i>Connects buyers and sellers.<br/>Handles search, ordering,<br/>payment, and fulfillment.</i>"]
+    end
+
+    subgraph external_sys [External Systems]
+        payment["Payment Provider<br/>[Stripe]<br/><i>Credit card processing</i>"]
+        email["Email Service<br/>[SendGrid]<br/><i>Transactional email</i>"]
+        shipping["Shipping Provider<br/>[ShipStation]<br/><i>Delivery management</i>"]
+        idp["Identity Provider<br/>[Auth0]<br/><i>SSO and social login</i>"]
+    end
+
+    customer -->|"Browses, orders,<br/>tracks shipments"| marketplace
+    seller -->|"Lists products,<br/>manages inventory"| marketplace
+    admin -->|"Manages platform,<br/>reviews reports"| marketplace
+
+    marketplace -->|"HTTPS/REST<br/>Charges, refunds"| payment
+    marketplace -->|"HTTPS/REST<br/>Sends notifications"| email
+    marketplace -->|"HTTPS/REST<br/>Creates shipments"| shipping
+    marketplace -->|"OIDC/OAuth 2.0<br/>Authenticates users"| idp
+
+    style marketplace fill:#4A90D9,color:white
+    style payment fill:#cccccc
+    style email fill:#cccccc
+    style shipping fill:#cccccc
+    style idp fill:#cccccc
+    style customer fill:#08427B,color:white
+    style seller fill:#08427B,color:white
+    style admin fill:#08427B,color:white

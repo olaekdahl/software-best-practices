@@ -1,0 +1,74 @@
+@startuml c4_level4_deployment
+skinparam defaultFontName Arial
+skinparam shadowing false
+skinparam ArrowColor #34495E
+skinparam RectangleBorderColor #34495E
+skinparam noteBackgroundColor #FDF2E9
+skinparam noteBorderColor #D35400
+
+title C4 Level 4 - Deployment: Online Marketplace
+
+node "AWS Region: us-east-1" {
+
+    node "VPC" {
+
+        node "Public Subnet" {
+            node "ALB\n[Application Load Balancer]" as alb
+            node "CloudFront\n[CDN]" as cdn
+        }
+
+        node "Private Subnet - Application" {
+            node "EKS Cluster" as eks {
+                node "Namespace: marketplace" {
+                    rectangle "API Gateway\n[Kong - 2 replicas]" as gw_pod #LightGreen
+                    rectangle "Product Service\n[3 replicas]" as prod_pod #LightGreen
+                    rectangle "Order Service\n[3 replicas]" as order_pod #LightGreen
+                    rectangle "User Service\n[2 replicas]" as user_pod #LightGreen
+                    rectangle "Notification Worker\n[2 replicas]" as notify_pod #LightGreen
+                }
+            }
+        }
+
+        node "Private Subnet - Data" {
+            database "RDS PostgreSQL\n[Multi-AZ]\nProduct DB" as prod_db
+            database "RDS PostgreSQL\n[Multi-AZ]\nOrder DB" as order_db
+            database "RDS PostgreSQL\n[Multi-AZ]\nUser DB" as user_db
+            database "ElastiCache Redis\n[Cluster Mode]" as redis
+            queue "Amazon MQ\n[RabbitMQ]" as mq
+            database "OpenSearch\n[3 nodes]" as search
+        }
+    }
+
+    node "S3" {
+        storage "Static Assets\n[Web App Build]" as s3_web
+        storage "Product Images" as s3_images
+    }
+}
+
+' --- External ---
+cloud "Internet" as internet
+rectangle "Stripe API" as stripe #LightGray
+rectangle "SendGrid API" as sendgrid #LightGray
+rectangle "Auth0" as auth0 #LightGray
+
+' --- Relationships ---
+internet --> cdn
+internet --> alb
+cdn --> s3_web
+alb --> gw_pod
+gw_pod --> prod_pod
+gw_pod --> order_pod
+gw_pod --> user_pod
+prod_pod --> prod_db
+prod_pod --> search
+prod_pod --> redis
+order_pod --> order_db
+order_pod --> redis
+order_pod --> mq
+user_pod --> user_db
+user_pod --> auth0
+notify_pod --> mq
+notify_pod --> sendgrid
+order_pod --> stripe
+
+@enduml

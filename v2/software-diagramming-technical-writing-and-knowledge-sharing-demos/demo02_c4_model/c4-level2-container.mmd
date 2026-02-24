@@ -1,0 +1,65 @@
+%%{init: {'theme': 'neutral'}}%%
+graph TB
+    subgraph users [Users]
+        customer["Customer"]
+        seller["Seller"]
+    end
+
+    subgraph marketplace ["Online Marketplace"]
+        webapp["Web App<br/>[React SPA]<br/><i>Product browsing, cart, checkout</i>"]
+        seller_portal["Seller Portal<br/>[React SPA]<br/><i>Inventory, fulfillment, analytics</i>"]
+        mobile["Mobile App<br/>[React Native]<br/><i>Push notifications, location search</i>"]
+
+        gateway["API Gateway<br/>[Kong]<br/><i>Routing, rate limiting, auth</i>"]
+
+        product_svc["Product Service<br/>[Python/FastAPI]<br/><i>Catalog, search, recommendations</i>"]
+        order_svc["Order Service<br/>[Python/FastAPI]<br/><i>Order lifecycle, payments</i>"]
+        user_svc["User Service<br/>[Python/FastAPI]<br/><i>Auth, profiles, RBAC</i>"]
+        notify_svc["Notification Service<br/>[Python/Celery]<br/><i>Email, SMS, push</i>"]
+
+        product_db[("Product DB<br/>[PostgreSQL]")]
+        order_db[("Order DB<br/>[PostgreSQL]")]
+        user_db[("User DB<br/>[PostgreSQL]")]
+        cache[("Cache<br/>[Redis]")]
+        search[("Search<br/>[Elasticsearch]")]
+        mq>"Event Bus<br/>[RabbitMQ]"]
+    end
+
+    subgraph external [External Systems]
+        stripe["Stripe"]
+        sendgrid["SendGrid"]
+    end
+
+    customer --> webapp
+    customer --> mobile
+    seller --> seller_portal
+
+    webapp -->|HTTPS| gateway
+    seller_portal -->|HTTPS| gateway
+    mobile -->|HTTPS| gateway
+
+    gateway --> product_svc
+    gateway --> order_svc
+    gateway --> user_svc
+
+    product_svc --> product_db
+    product_svc --> search
+    product_svc --> cache
+    order_svc --> order_db
+    order_svc --> cache
+    order_svc -->|"AMQP"| mq
+    order_svc --> stripe
+    user_svc --> user_db
+    notify_svc -->|"AMQP"| mq
+    notify_svc --> sendgrid
+
+    style webapp fill:#4A90D9,color:white
+    style seller_portal fill:#4A90D9,color:white
+    style mobile fill:#4A90D9,color:white
+    style gateway fill:#27AE60,color:white
+    style product_svc fill:#27AE60,color:white
+    style order_svc fill:#27AE60,color:white
+    style user_svc fill:#27AE60,color:white
+    style notify_svc fill:#27AE60,color:white
+    style stripe fill:#ccc
+    style sendgrid fill:#ccc

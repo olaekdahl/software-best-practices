@@ -1,0 +1,44 @@
+@startuml c4_level1_context
+skinparam defaultFontName Arial
+skinparam shadowing false
+skinparam ArrowColor #34495E
+skinparam RectangleBorderColor #34495E
+skinparam noteBackgroundColor #FDF2E9
+skinparam noteBorderColor #D35400
+
+title C4 Level 1 - System Context: Online Marketplace
+
+' --- External actors ---
+actor "Customer" as customer
+actor "Seller" as seller
+actor "Admin" as admin
+
+' --- The system under design ---
+rectangle "Online Marketplace\n[Software System]\n\nConnects buyers and sellers.\nHandles search, ordering,\npayment, and fulfillment." as marketplace #LightBlue
+
+' --- External systems ---
+rectangle "Payment Provider\n[External System]\n\nProcesses credit card\nand bank payments\n(e.g., Stripe)" as payment #LightGray
+
+rectangle "Email Service\n[External System]\n\nSends transactional email\n(e.g., SendGrid)" as email #LightGray
+
+rectangle "Shipping Provider\n[External System]\n\nManages deliveries\nand tracking\n(e.g., ShipStation)" as shipping #LightGray
+
+rectangle "Identity Provider\n[External System]\n\nSSO and social login\n(e.g., Auth0)" as idp #LightGray
+
+' --- Relationships ---
+customer --> marketplace : Browses products,\nplaces orders,\ntracks shipments
+seller --> marketplace : Lists products,\nmanages inventory,\nviews analytics
+admin --> marketplace : Manages platform,\nreviews reports,\nhandles disputes
+
+marketplace --> payment : Charges customers,\nprocesses refunds\n[HTTPS/REST]
+marketplace --> email : Sends order confirmations,\nshipping updates\n[HTTPS/REST]
+marketplace --> shipping : Creates shipments,\ngets tracking info\n[HTTPS/REST]
+marketplace --> idp : Authenticates users\n[OIDC/OAuth 2.0]
+
+note right of marketplace
+  This is the highest-level view.
+  Show this to stakeholders and
+  new team members first.
+end note
+
+@enduml

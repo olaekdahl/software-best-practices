@@ -1,0 +1,39 @@
+# markdownlint configuration
+# See: https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md
+
+# Default: all rules enabled
+default: true
+
+# MD013 - Line length
+# Allow longer lines for tables and code blocks
+MD013:
+  line_length: 120
+  code_blocks: false
+  tables: false
+
+# MD024 - No duplicate headings
+# Allow duplicate headings in different sections (e.g., "Examples" under multiple endpoints)
+MD024:
+  siblings_only: true
+
+# MD033 - No inline HTML
+# Allow some HTML for things Markdown cannot do
+MD033:
+  allowed_elements:
+    - br
+    - details
+    - summary
+    - sup
+
+# MD041 - First line should be a top-level heading
+MD041: true
+
+# MD046 - Code block style
+# Prefer fenced (```) over indented code blocks
+MD046:
+  style: fenced
+
+# MD048 - Code fence style
+# Use backticks, not tildes
+MD048:
+  style: backtick

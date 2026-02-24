@@ -1,0 +1,10 @@
+[tool.bandit]
+# Bandit SAST configuration
+# See: https://bandit.readthedocs.io/en/latest/config.html
+exclude_dirs = ["tests", ".venv", "venv"]
+skips = ["B101"]  # Skip assert warnings (used in tests)
+targets = ["src"]
+
+[tool.bandit.assert_used]
+# Allow assert in test files
+skips = ["*/test_*.py", "*/tests/*"]

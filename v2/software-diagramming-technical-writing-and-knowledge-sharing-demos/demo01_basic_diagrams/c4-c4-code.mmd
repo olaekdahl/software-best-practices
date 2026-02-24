@@ -1,0 +1,47 @@
+%%{init: {'theme': 'neutral'}}%%
+classDiagram
+    class OrderPort {
+        <<interface>>
+        +create_order(items) Order
+        +get_order(order_id) Order
+    }
+
+    class OrderService {
+        -repo: OrderRepository
+        -payments: PaymentPort
+        +create_order(items) Order
+        +get_order(order_id) Order
+    }
+
+    class PaymentPort {
+        <<interface>>
+        +charge(amount, token) TxnResult
+    }
+
+    class OrderRepository {
+        <<interface>>
+        +save(order) None
+        +find_by_id(id) Order
+    }
+
+    class Order {
+        +id: str
+        +items: list~Item~
+        +status: str
+        +total: float
+    }
+
+    class Item {
+        +sku: str
+        +name: str
+        +price: float
+        +qty: int
+    }
+
+    OrderService ..|> OrderPort
+    OrderService --> PaymentPort : uses
+    OrderService --> OrderRepository : uses
+    OrderService --> Order : creates
+    Order *-- Item : contains
+
+    note for OrderService "Code-level view.\nRarely maintained manually -\nIDEs and tools do this better."

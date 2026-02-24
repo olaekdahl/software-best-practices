@@ -1,0 +1,222 @@
+openapi: "3.0.3"
+info:
+  title: Jobs API
+  version: "1.0.0"
+  description: |
+    Demo API showing best practices for REST design.
+    Demonstrates HTTP semantics, RFC 7807 errors, cursor pagination,
+    and OpenAPI-first documentation.
+  contact:
+    name: API Team
+    email: api-team@example.com
+
+servers:
+  - url: http://localhost:8000
+    description: Local development
+
+paths:
+  /api/v1/jobs:
+    get:
+      summary: List jobs with cursor pagination
+      operationId: listJobs
+      tags: [Jobs]
+      parameters:
+        - name: cursor
+          in: query
+          description: Opaque cursor for pagination (from previous response)
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Maximum number of results per page
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+        - name: status
+          in: query
+          description: Filter by job status
+          schema:
+            type: string
+            enum: [pending, running, completed, failed, cancelled]
+      responses:
+        "200":
+          description: Paginated list of jobs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Job"
+                  pagination:
+                    $ref: "#/components/schemas/CursorPagination"
+    post:
+      summary: Create a new job
+      operationId: createJob
+      tags: [Jobs]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateJobRequest"
+      responses:
+        "201":
+          description: Job created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Job"
+          headers:
+            Location:
+              description: URL of the created job
+              schema:
+                type: string
+        "422":
+          description: Validation error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+
+  /api/v1/jobs/{job_id}:
+    get:
+      summary: Get a job by ID
+      operationId: getJob
+      tags: [Jobs]
+      parameters:
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Job details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Job"
+        "404":
+          description: Job not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+
+    delete:
+      summary: Cancel a job
+      operationId: cancelJob
+      tags: [Jobs]
+      parameters:
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Job cancelled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Job"
+        "404":
+          description: Job not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "409":
+          description: Job cannot be cancelled (already completed/failed)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+
+components:
+  schemas:
+    Job:
+      type: object
+      required: [id, name, status, created_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        name:
+          type: string
+          example: "data-export-2026-01"
+        description:
+          type: string
+          example: "Monthly data export for analytics"
+        status:
+          type: string
+          enum: [pending, running, completed, failed, cancelled]
+        priority:
+          type: integer
+          minimum: 1
+          maximum: 5
+          default: 3
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CreateJobRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+          example: "data-export-2026-01"
+        description:
+          type: string
+          maxLength: 1000
+        priority:
+          type: integer
+          minimum: 1
+          maximum: 5
+          default: 3
+
+    CursorPagination:
+      type: object
+      properties:
+        next_cursor:
+          type: string
+          nullable: true
+          description: Cursor to fetch the next page (null if no more results)
+        has_more:
+          type: boolean
+
+    ProblemDetail:
+      type: object
+      description: RFC 7807 Problem Details
+      required: [type, title, status]
+      properties:
+        type:
+          type: string
+          format: uri
+          example: "https://api.example.com/problems/not-found"
+        title:
+          type: string
+          example: "Resource Not Found"
+        status:
+          type: integer
+          example: 404
+        detail:
+          type: string
+          example: "Job with ID 550e8400-... was not found"
+        instance:
+          type: string
+          format: uri

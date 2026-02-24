@@ -1,0 +1,38 @@
+@startuml c3_component
+skinparam defaultFontName Arial
+skinparam shadowing false
+skinparam ArrowColor #34495E
+skinparam RectangleBorderColor #34495E
+
+title C3 - Component: API Server
+
+rectangle "API Server" {
+  rectangle "Auth Controller\n<<component>>" as auth #LightBlue
+  rectangle "Order Controller\n<<component>>" as orders #LightBlue
+  rectangle "Catalog Controller\n<<component>>" as catalog #LightBlue
+  rectangle "Order Service\n<<component>>" as orderSvc #LightGreen
+  rectangle "Catalog Service\n<<component>>" as catSvc #LightGreen
+  rectangle "Payment Adapter\n<<component>>" as paySvc #LightYellow
+  rectangle "Order Repository\n<<component>>" as orderRepo #Wheat
+  rectangle "Book Repository\n<<component>>" as bookRepo #Wheat
+}
+
+database "Database\n[PostgreSQL]" as db #LightGray
+rectangle "Payment Provider\n[External]" as payment #LightGray
+
+auth --> orders : Authenticates
+auth --> catalog : Authenticates
+orders --> orderSvc : Delegates
+catalog --> catSvc : Delegates
+orderSvc --> paySvc : Charges card
+orderSvc --> orderRepo : Reads/writes orders
+catSvc --> bookRepo : Reads/writes books
+orderRepo --> db : SQL
+bookRepo --> db : SQL
+paySvc --> payment : HTTPS
+
+note bottom of orderSvc
+  Zoom into one component
+  for C4 (code level).
+end note
+@enduml

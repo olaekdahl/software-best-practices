@@ -1,0 +1,95 @@
+@startuml class_order_domain
+skinparam defaultFontName Arial
+skinparam shadowing false
+skinparam ArrowColor #34495E
+skinparam RectangleBorderColor #34495E
+
+title Order Domain - Class Diagram
+
+' ---------- Interfaces (Ports) ----------
+
+interface PaymentGateway <<Port>> {
+    +charge(amount: float): TransactionId
+    +refund(txn_id: str): bool
+}
+
+interface OrderRepository <<Port>> {
+    +save(order: Order): void
+    +find_by_id(id: str): Order
+    +find_by_customer(customer_id: str): List<Order>
+}
+
+interface NotificationService <<Port>> {
+    +send(recipient: str, subject: str, body: str): void
+}
+
+' ---------- Domain entities ----------
+
+class Order <<Entity>> {
+    -id: str
+    -customer_id: str
+    -items: List<OrderItem>
+    -status: OrderStatus
+    -created_at: datetime
+    +add_item(item: OrderItem): void
+    +submit(): void
+    +cancel(): void
+    +total(): float
+}
+
+class OrderItem <<Value Object>> {
+    -sku: str
+    -name: str
+    -quantity: int
+    -unit_price: float
+    +total(): float
+}
+
+enum OrderStatus <<Enumeration>> {
+    DRAFT
+    SUBMITTED
+    CONFIRMED
+    SHIPPED
+    DELIVERED
+    CANCELLED
+}
+
+' ---------- Application layer ----------
+
+class OrderService <<Use Case>> {
+    -repository: OrderRepository
+    -payment: PaymentGateway
+    -notifier: NotificationService
+    +create_order(customer_id, items): Order
+    +submit_order(order_id): void
+    +cancel_order(order_id): void
+}
+
+' ---------- Infrastructure adapters ----------
+
+class StripeAdapter <<Adapter>> {
+    -api_key: str
+    +charge(amount): TransactionId
+    +refund(txn_id): bool
+}
+
+class PostgresOrderRepo <<Adapter>> {
+    -connection_pool: Pool
+    +save(order): void
+    +find_by_id(id): Order
+    +find_by_customer(customer_id): List<Order>
+}
+
+' ---------- Relationships ----------
+
+Order *-- OrderItem : contains
+Order --> OrderStatus : has
+
+OrderService --> OrderRepository : uses
+OrderService --> PaymentGateway : uses
+OrderService --> NotificationService : uses
+
+StripeAdapter ..|> PaymentGateway : implements
+PostgresOrderRepo ..|> OrderRepository : implements
+
+@enduml

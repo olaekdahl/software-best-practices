@@ -1,0 +1,76 @@
+@startuml c4_level2_container
+skinparam defaultFontName Arial
+skinparam shadowing false
+skinparam ArrowColor #34495E
+skinparam RectangleBorderColor #34495E
+skinparam noteBackgroundColor #FDF2E9
+skinparam noteBorderColor #D35400
+
+title C4 Level 2 - Containers: Online Marketplace
+
+actor "Customer" as customer
+actor "Seller" as seller
+
+rectangle "Online Marketplace" {
+
+    ' --- User-facing applications (Blue) ---
+    rectangle "Web App\n[React SPA]\n\nProduct browsing,\ncart, checkout" as webapp #LightBlue
+
+    rectangle "Seller Portal\n[React SPA]\n\nInventory management,\norder fulfillment,\nanalytics" as seller_portal #LightBlue
+
+    rectangle "Mobile App\n[React Native]\n\nPush notifications,\nlocation-based search" as mobile #LightBlue
+
+    ' --- Backend services (Green) ---
+    rectangle "API Gateway\n[Kong]\n\nRouting, rate limiting,\nauthentication,\nrequest logging" as gateway #LightGreen
+
+    rectangle "Product Service\n[Python/FastAPI]\n\nProduct catalog,\nsearch (Elasticsearch),\nrecommendations" as product_svc #LightGreen
+
+    rectangle "Order Service\n[Python/FastAPI]\n\nOrder lifecycle,\npayment orchestration,\ninventory reservation" as order_svc #LightGreen
+
+    rectangle "User Service\n[Python/FastAPI]\n\nAuth, user profiles,\npermissions, RBAC" as user_svc #LightGreen
+
+    rectangle "Notification Service\n[Python/Celery]\n\nEmail, SMS, push\nnotification routing" as notify_svc #LightGreen
+
+    ' --- Data stores ---
+    database "Product DB\n[PostgreSQL]" as product_db
+    database "Order DB\n[PostgreSQL]" as order_db
+    database "User DB\n[PostgreSQL]" as user_db
+    database "Search Index\n[Elasticsearch]" as search
+    database "Cache\n[Redis]" as cache
+    queue "Event Bus\n[RabbitMQ]" as mq
+}
+
+' --- External systems ---
+rectangle "Stripe" as payment #LightGray
+rectangle "SendGrid" as email #LightGray
+rectangle "Auth0" as idp #LightGray
+
+' --- Relationships ---
+customer --> webapp : HTTPS
+customer --> mobile : HTTPS
+seller --> seller_portal : HTTPS
+
+webapp --> gateway : HTTPS/REST
+seller_portal --> gateway : HTTPS/REST
+mobile --> gateway : HTTPS/REST
+
+gateway --> product_svc : HTTP/REST
+gateway --> order_svc : HTTP/REST
+gateway --> user_svc : HTTP/REST
+
+product_svc --> product_db : SQL
+product_svc --> search : REST
+product_svc --> cache : Redis protocol
+
+order_svc --> order_db : SQL
+order_svc --> cache : Redis protocol
+order_svc --> mq : AMQP (publish)
+order_svc --> payment : HTTPS/REST
+
+user_svc --> user_db : SQL
+user_svc --> idp : OIDC
+
+notify_svc --> mq : AMQP (consume)
+notify_svc --> email : HTTPS/REST
+
+@enduml

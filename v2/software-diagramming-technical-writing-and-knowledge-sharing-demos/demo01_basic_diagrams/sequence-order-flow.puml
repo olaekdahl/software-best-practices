@@ -1,0 +1,45 @@
+@startuml order_sequence
+skinparam defaultFontName Arial
+skinparam shadowing false
+skinparam ArrowColor #34495E
+skinparam RectangleBorderColor #34495E
+
+title Order Processing Sequence
+
+actor Customer
+participant "API Gateway" as API
+participant "Order Service" as Orders
+participant "Payment Service" as Payment
+participant "Inventory Service" as Inventory
+database "Order DB" as DB
+
+Customer -> API: POST /orders
+API -> Orders: createOrder(items)
+
+Orders -> Inventory: reserveItems(items)
+alt Items Available
+    Inventory --> Orders: reserved(reservation_id)
+else Out of Stock
+    Inventory --> Orders: stockError(sku)
+    Orders --> API: 409 Conflict
+    API --> Customer: Items unavailable
+end
+
+Orders -> DB: INSERT order (status=pending)
+
+Orders -> Payment: chargeCard(amount)
+alt Payment Successful
+    Payment --> Orders: success(txn_id)
+    Orders -> DB: UPDATE status=confirmed
+    Orders -> Inventory: confirmReservation(reservation_id)
+    Orders --> API: 201 Created
+    API --> Customer: Order confirmed
+else Payment Failed
+    Payment --> Orders: failure(reason)
+    Orders -> DB: UPDATE status=failed
+    Orders -> Inventory: releaseReservation(reservation_id)
+    Orders --> API: 402 Payment Required
+    API --> Customer: Payment failed
+end
+
+@enduml

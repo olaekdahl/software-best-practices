@@ -19,7 +19,6 @@ class ConsoleLogger:
     def info(self, msg: str) -> None:
         print(f"[INFO] {msg}")
 
-
 class Service:
     def __init__(self, logger: Logger) -> None:
         self.logger = logger

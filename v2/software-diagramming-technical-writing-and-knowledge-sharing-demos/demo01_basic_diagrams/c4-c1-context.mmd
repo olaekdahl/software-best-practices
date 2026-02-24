@@ -1,0 +1,16 @@
+%%{init: {'theme': 'neutral'}}%%
+flowchart TD
+    cust["👤 Customer"]
+    admin["👤 Admin"]
+    bookstore["Online Bookstore<br/><i>[Software System]</i>"]
+    payment["Payment Provider<br/><i>[External System]</i>"]
+    email["Email Service<br/><i>[External System]</i>"]
+
+    cust -->|"Browses catalog,<br/>places orders"| bookstore
+    admin -->|"Manages inventory,<br/>views reports"| bookstore
+    bookstore -->|"Processes payments"| payment
+    bookstore -->|"Sends order confirmations"| email
+
+    style bookstore fill:#add8e6,stroke:#34495E
+    style payment fill:#d3d3d3,stroke:#34495E
+    style email fill:#d3d3d3,stroke:#34495E

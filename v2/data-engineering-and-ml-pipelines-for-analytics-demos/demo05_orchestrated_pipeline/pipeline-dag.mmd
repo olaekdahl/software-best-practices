@@ -1,0 +1,43 @@
+%%{init: {'theme': 'neutral'}}%%
+graph LR
+  subgraph Ingestion
+    direction TB
+    A[Raw CSV Files] --> B[Extract & Validate]
+    B --> C{Valid?}
+    C -->|Yes| D[Load to Staging]
+    C -->|No| E[Dead Letter Queue]
+  end
+
+  subgraph Transformation
+    direction TB
+    D --> F[Clean & Normalize]
+    F --> G[Enrich with Lookups]
+    G --> H[Compute Aggregates]
+  end
+
+  subgraph Serving
+    direction TB
+    H --> I[Load to Warehouse]
+    I --> J[Materialized Views]
+    J --> K[Dashboard / BI]
+    I --> L[ML Feature Store]
+    L --> M[Model Training]
+  end
+
+  subgraph Monitoring
+    direction TB
+    N[Data Quality Checks]
+    O[Pipeline Metrics]
+    P[Alerting]
+    N --> P
+    O --> P
+  end
+
+  H --> N
+  I --> O
+
+  style A fill:#E8F6F3,stroke:#1ABC9C
+  style E fill:#FDEDEC,stroke:#E74C3C
+  style K fill:#EBF5FB,stroke:#3498DB
+  style M fill:#F5EEF8,stroke:#9B59B6
+  style P fill:#FDF2E9,stroke:#D35400

@@ -1,0 +1,70 @@
+# Pipeline Configuration
+# Used by the orchestrated pipeline demo to show externalized configuration
+# rather than hardcoded values in source code.
+
+pipeline:
+  name: order-analytics-pipeline
+  version: "1.0"
+  schedule: "0 2 * * *"  # Daily at 2 AM UTC
+
+stages:
+  extract:
+    source_type: csv
+    source_path: ./data/raw/
+    file_pattern: "orders-*.csv"
+    encoding: utf-8
+    delimiter: ","
+
+  validate:
+    schema: ./order-data-contract.json
+    fail_on_error: false
+    quarantine_path: ./data/quarantine/
+    quality_checks:
+      - name: completeness
+        columns: [order_id, customer_name, product, quantity, unit_price]
+        threshold: 0.95
+      - name: freshness
+        column: order_date
+        max_age_days: 30
+      - name: uniqueness
+        column: order_id
+
+  transform:
+    operations:
+      - name: normalize_dates
+        column: order_date
+        target_format: "ISO8601"
+      - name: compute_totals
+        expression: "quantity * unit_price"
+        output_column: total_amount
+      - name: categorize_orders
+        column: total_amount
+        bins: [0, 50, 200, 1000, 999999]
+        labels: [small, medium, large, enterprise]
+        output_column: order_tier
+
+  load:
+    target_type: sqlite
+    database: ./data/warehouse.db
+    table: fact_orders
+    write_mode: upsert
+    key_columns: [order_id]
+
+monitoring:
+  metrics_port: 9090
+  alert_on_failure: true
+  alert_channels:
+    - type: slack
+      webhook_env: SLACK_WEBHOOK_URL
+    - type: email
+      recipients: [data-team@example.com]
+  sla:
+    max_runtime_minutes: 30
+    min_rows_processed: 100
+
+retry:
+  max_attempts: 3
+  backoff_seconds: [10, 60, 300]
+  retry_on:
+    - ConnectionError
+    - TimeoutError

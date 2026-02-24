@@ -1,0 +1,45 @@
+%%{init: {'theme': 'neutral'}}%%
+flowchart TD
+    subgraph apiServer ["API Server"]
+        subgraph controllers ["Controllers"]
+            auth["Auth Controller"]
+            orders["Order Controller"]
+            catalog["Catalog Controller"]
+        end
+        subgraph services ["Services"]
+            orderSvc["Order Service"]
+            catSvc["Catalog Service"]
+        end
+        subgraph adapters ["Adapters"]
+            paySvc["Payment Adapter"]
+        end
+        subgraph repos ["Repositories"]
+            orderRepo["Order Repository"]
+            bookRepo["Book Repository"]
+        end
+    end
+
+    db[("Database<br/><i>[PostgreSQL]</i>")]
+    payment["Payment Provider<br/><i>[External]</i>"]
+
+    auth -->|"Authenticates"| orders
+    auth -->|"Authenticates"| catalog
+    orders -->|"Delegates"| orderSvc
+    catalog -->|"Delegates"| catSvc
+    orderSvc -->|"Charges card"| paySvc
+    orderSvc -->|"Reads/writes orders"| orderRepo
+    catSvc -->|"Reads/writes books"| bookRepo
+    orderRepo -->|"SQL"| db
+    bookRepo -->|"SQL"| db
+    paySvc -->|"HTTPS"| payment
+
+    style auth fill:#add8e6,stroke:#34495E
+    style orders fill:#add8e6,stroke:#34495E
+    style catalog fill:#add8e6,stroke:#34495E
+    style orderSvc fill:#90ee90,stroke:#34495E
+    style catSvc fill:#90ee90,stroke:#34495E
+    style paySvc fill:#ffffaa,stroke:#34495E
+    style orderRepo fill:#f5deb3,stroke:#34495E
+    style bookRepo fill:#f5deb3,stroke:#34495E
+    style db fill:#d3d3d3,stroke:#34495E
+    style payment fill:#d3d3d3,stroke:#34495E

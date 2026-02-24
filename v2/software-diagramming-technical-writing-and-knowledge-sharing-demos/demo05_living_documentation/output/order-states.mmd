@@ -1,0 +1,12 @@
+%%{init: {'theme': 'neutral'}}%%
+stateDiagram-v2
+    [*] --> DRAFT : create()
+    DRAFT --> CANCELLED : cancel()
+    SUBMITTED --> CANCELLED : cancel()
+    CONFIRMED --> CANCELLED : cancel()
+    SUBMITTED --> CONFIRMED : confirm()
+    SHIPPED --> DELIVERED : deliver()
+    CONFIRMED --> SHIPPED : ship()
+    DRAFT --> SUBMITTED : submit()
+    DELIVERED --> [*]
+    CANCELLED --> [*]
