@@ -10,6 +10,7 @@ This folder contains small, runnable demos for common data/ML pipeline concepts.
 - orchestration/airflow/ — Airflow DAG version of the pipeline (optional dependency).
 - orchestration/prefect/ — Prefect flow version of the pipeline (optional dependency).
 - ml-pipeline/ — Minimal ML pipeline: data prep → training (linear regression) → deploy with a tiny FastAPI service.
+- lineage/ — Lightweight data-lineage tracker: records assets, transformations, and dependencies as a DAG for impact analysis.
 
 See each subfolder for scripts and usage notes below.
 
@@ -26,6 +27,8 @@ See each subfolder for scripts and usage notes below.
     - `python3 data-engineering-and-ml-pipelines/ml-pipeline/train_model.py`
   - Start the API (from repo root, no cd needed):
     - `uvicorn serve_model:app --reload --app-dir data-engineering-and-ml-pipelines/ml-pipeline`
+- Data lineage:
+  - `python3 data-engineering-and-ml-pipelines/lineage/trace_pipeline.py`
 
 Note: The serving step uses FastAPI/uvicorn (already in this repo's requirements).
 

@@ -1,0 +1,183 @@
+{
+  "generated_at": "2026-02-25T22:48:47.821402Z",
+  "assets": {
+    "customers.csv": {
+      "name": "customers.csv",
+      "kind": "source",
+      "description": "",
+      "file_path": "/home/ola/ciracon/software-best-practices/data-engineering-and-ml-pipelines/ingestion-and-transformation/data/customers.csv",
+      "format": "CSV",
+      "record_count": 4,
+      "schema_snapshot": [
+        "customer_id",
+        "name",
+        "email"
+      ],
+      "sha256": "bec1ce3a632c7689de348c7d83ddc387f330f9741cc050a8e90a70946d4c5f5b",
+      "created_at": null,
+      "metadata": {}
+    },
+    "orders.json": {
+      "name": "orders.json",
+      "kind": "source",
+      "description": "",
+      "file_path": "/home/ola/ciracon/software-best-practices/data-engineering-and-ml-pipelines/ingestion-and-transformation/data/orders.json",
+      "format": "JSON",
+      "record_count": 3,
+      "schema_snapshot": [
+        "amount",
+        "customer_id",
+        "order_id"
+      ],
+      "sha256": "d40bdbcd90f58d8a219932a3097e943b81dfe05aff893ac23f0bd5cc525357da",
+      "created_at": null,
+      "metadata": {}
+    },
+    "regions_db": {
+      "name": "regions_db",
+      "kind": "source",
+      "description": "In-memory SQLite table with customer\u2192region mapping",
+      "file_path": null,
+      "format": "SQLite",
+      "record_count": 2,
+      "schema_snapshot": [
+        "customer_id",
+        "region"
+      ],
+      "sha256": null,
+      "created_at": null,
+      "metadata": {}
+    },
+    "cleaned_customers.csv": {
+      "name": "cleaned_customers.csv",
+      "kind": "derived",
+      "description": "",
+      "file_path": "/home/ola/ciracon/software-best-practices/data-engineering-and-ml-pipelines/ingestion-and-transformation/output/cleaned_customers.csv",
+      "format": "CSV",
+      "record_count": 3,
+      "schema_snapshot": [
+        "customer_id",
+        "name",
+        "email",
+        "region"
+      ],
+      "sha256": "8eca21dc186a1965b67ba187a74e0f3d91c461130a5d3fc0d59c1b1953d76b28",
+      "created_at": null,
+      "metadata": {}
+    },
+    "customer_order_summary.csv": {
+      "name": "customer_order_summary.csv",
+      "kind": "derived",
+      "description": "",
+      "file_path": "/home/ola/ciracon/software-best-practices/data-engineering-and-ml-pipelines/ingestion-and-transformation/output/customer_order_summary.csv",
+      "format": "CSV",
+      "record_count": 2,
+      "schema_snapshot": [
+        "customer_id",
+        "order_count",
+        "total_amount"
+      ],
+      "sha256": "e70cb01b907511350d2293aeca5186f799185022aeb670e6ce652dacb53edcac",
+      "created_at": null,
+      "metadata": {}
+    },
+    "model.json": {
+      "name": "model.json",
+      "kind": "derived",
+      "description": "",
+      "file_path": "/home/ola/ciracon/software-best-practices/data-engineering-and-ml-pipelines/ml-pipeline/model_store/model.json",
+      "format": "JSON",
+      "record_count": null,
+      "schema_snapshot": [
+        "created_at",
+        "intercept",
+        "slope",
+        "type"
+      ],
+      "sha256": "10b0339df7a41a7201d3799eb5003d082de9e408fd9a3ee5bcaa3aa0c8576aa6",
+      "created_at": null,
+      "metadata": {}
+    },
+    "/predict endpoint": {
+      "name": "/predict endpoint",
+      "kind": "endpoint",
+      "description": "HTTP GET /predict?x=N \u2014 returns y = slope*x + intercept",
+      "file_path": null,
+      "format": "FastAPI",
+      "record_count": null,
+      "schema_snapshot": [
+        "x (query param)",
+        "prediction (response)"
+      ],
+      "sha256": null,
+      "created_at": null,
+      "metadata": {
+        "url": "http://127.0.0.1:8000/predict"
+      }
+    }
+  },
+  "transformations": [
+    {
+      "name": "ingest_and_clean",
+      "description": "Read CSV + JSON + SQLite, deduplicate, enrich with regions, summarise orders, write cleaned outputs.",
+      "inputs": [
+        "customers.csv",
+        "orders.json",
+        "regions_db"
+      ],
+      "outputs": [
+        "cleaned_customers.csv",
+        "customer_order_summary.csv"
+      ],
+      "script": "ingestion-and-transformation/ingest_transform.py",
+      "timestamp": "2026-02-25T22:48:47.816640Z",
+      "metadata": {}
+    },
+    {
+      "name": "train_model",
+      "description": "Generate synthetic data, fit simple linear regression, save slope + intercept to JSON.",
+      "inputs": [
+        "customer_order_summary.csv"
+      ],
+      "outputs": [
+        "model.json"
+      ],
+      "script": "ml-pipeline/train_model.py",
+      "timestamp": "2026-02-25T22:48:47.818057Z",
+      "metadata": {}
+    },
+    {
+      "name": "serve_model",
+      "description": "FastAPI app loads model.json and exposes /predict.",
+      "inputs": [
+        "model.json"
+      ],
+      "outputs": [
+        "/predict endpoint"
+      ],
+      "script": "ml-pipeline/serve_model.py",
+      "timestamp": "2026-02-25T22:48:47.818100Z",
+      "metadata": {}
+    }
+  ],
+  "edges": {
+    "customers.csv": [
+      "cleaned_customers.csv",
+      "customer_order_summary.csv"
+    ],
+    "orders.json": [
+      "cleaned_customers.csv",
+      "customer_order_summary.csv"
+    ],
+    "regions_db": [
+      "cleaned_customers.csv",
+      "customer_order_summary.csv"
+    ],
+    "customer_order_summary.csv": [
+      "model.json"
+    ],
+    "model.json": [
+      "/predict endpoint"
+    ]
+  }
+}

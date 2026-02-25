@@ -1,10 +1,10 @@
-.PHONY := all ingest batch stream orchestrate train serve clean airflow-dag airflow-web airflow-scheduler airflow-trigger prefect-flow prefect-server
+.PHONY := all ingest batch stream orchestrate train serve lineage clean airflow-dag airflow-web airflow-scheduler airflow-trigger prefect-flow prefect-server
 
 PY ?= python3
 UVICORN ?= uvicorn
 
 # Run everything except the server
-all: ingest batch stream orchestrate train
+all: ingest batch stream orchestrate train lineage
 
 ingest:
 	$(PY) ingestion-and-transformation/ingest_transform.py
@@ -20,6 +20,9 @@ orchestrate:
 
 train:
 	$(PY) ml-pipeline/train_model.py
+
+lineage:
+	$(PY) lineage/trace_pipeline.py
 
 serve:
 	$(UVICORN) serve_model:app --reload --app-dir ml-pipeline
@@ -57,3 +60,4 @@ clean:
 	rm -rf batch-vs-streaming/output
 	rm -rf orchestration/output orchestration/warehouse
 	rm -rf ml-pipeline/model_store
+	rm -rf lineage/output

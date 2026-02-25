@@ -32,6 +32,7 @@ from pydantic import BaseModel, Field, field_validator
 app = FastAPI(
     title="Jobs API",
     version="1.0.0",
+    docs_url="/swagger",
     description="Demo API showing best practices for REST design",
 )
 
