@@ -172,6 +172,24 @@ Prereqs → Install → Run → Verify
     vale docs/
     ```
 
+### Extended demos
+
+Each topic folder now includes additional progressive demos. Highlights:
+
+| Folder | New Demos |
+|--------|-----------|
+| `data-engineering-and-ml-pipelines/` | Anti-pattern ETL, idempotent pipelines, data contracts, ML lifecycle |
+| `performance-considerations/` | TTL caching strategies, resilience patterns (circuit breaker, retry, bulkhead) |
+| `security-by-design/` | STRIDE threat model, JWT deep-dive, secrets rotation, secure CI pipeline |
+| `software-principles-and-patterns/` | REST API design (RFC 7807, pagination), modular monolith architecture |
+| `software-diagramming/` | Comprehensive PlantUML + Mermaid examples (sequence, class, state, ER, Gantt) |
+| `technical-writing-and-knowledge-sharing/` | BLUF, ADRs, runbooks, docs-as-code pipeline, living documentation |
+| `testing-fundamentals/` | Fixtures/parametrize, Hypothesis property-based testing |
+| `code-quality-tools/` | Modern ruff + mypy + pre-commit quality pipeline |
+| `troubleshooting-strategies/` | Buggy app exercises, structured logging, observability triage, incident response |
+
+See each folder's README for setup and run instructions.
+
 ## Configuration
 
 - App host/port

@@ -1,0 +1,37 @@
+%%{init: {'theme': 'neutral'}}%%
+sequenceDiagram
+    participant U as User (Browser)
+    participant A as API Gateway
+    participant S as Auth Service
+    participant O as Order Service
+    participant D as Database
+    participant C as Cache (Redis)
+
+    U->>A: POST /orders (Bearer token)
+    A->>S: Validate JWT
+    S->>C: Check token revocation list
+    C-->>S: Not revoked
+
+    alt Token Valid
+        S-->>A: Valid (user_id, roles)
+    else Token Expired
+        S-->>A: 401 Unauthorized
+        A-->>U: 401 - Token expired
+    end
+
+    A->>O: Create order (user_id from token)
+    O->>D: INSERT order
+    D-->>O: OK (order_id)
+    O->>C: Cache order (TTL=300s)
+    O-->>A: 201 Created (order_id)
+    A-->>U: 201 - Order confirmation
+
+    Note over U,D: Subsequent read hits cache first
+    U->>A: GET /orders/{id}
+    A->>S: Validate JWT
+    S-->>A: Valid
+    A->>O: Get order
+    O->>C: Check cache
+    C-->>O: Cache hit (order data)
+    O-->>A: 200 OK
+    A-->>U: Order details

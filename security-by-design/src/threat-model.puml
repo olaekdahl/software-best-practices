@@ -1,0 +1,74 @@
+@startuml threat-model
+skinparam defaultFontName Arial
+skinparam shadowing false
+skinparam ArrowColor #34495E
+skinparam RectangleBorderColor #34495E
+skinparam noteBackgroundColor #FDF2E9
+skinparam noteBorderColor #D35400
+
+title STRIDE Threat Model - Order Processing System
+
+rectangle "Trust Boundary: Internet" #FDEDEC {
+  actor "Customer\n(Browser)" as user
+  actor "Attacker" as attacker
+}
+
+rectangle "Trust Boundary: DMZ" #EBF5FB {
+  component "WAF /\nLoad Balancer" as waf
+  component "API Gateway\n(Auth + Rate Limit)" as gateway
+}
+
+rectangle "Trust Boundary: Internal Network" #E8F8F5 {
+  component "Order Service" as order_svc
+  component "Payment Service" as pay_svc
+  component "Notification Service" as notify_svc
+  database "PostgreSQL\n(Orders)" as db
+  queue "RabbitMQ" as mq
+}
+
+rectangle "Trust Boundary: External" #F5EEF8 {
+  cloud "Stripe API" as stripe
+  cloud "Email Provider" as email_provider
+}
+
+user --> waf : HTTPS
+attacker ..> waf : Attack vectors
+waf --> gateway
+gateway --> order_svc : mTLS
+order_svc --> db : TLS + Encrypted at rest
+order_svc --> mq : TLS
+mq --> pay_svc
+mq --> notify_svc
+pay_svc --> stripe : HTTPS + API key
+notify_svc --> email_provider : HTTPS + API key
+
+note right of waf
+  **Threats mitigated:**
+  - DDoS (rate limiting)
+  - SQL injection (WAF rules)
+  - XSS (content filtering)
+end note
+
+note right of gateway
+  **Threats mitigated:**
+  - Spoofing (JWT validation)
+  - Tampering (request signing)
+  - Repudiation (audit logging)
+  - Elevation of privilege (RBAC)
+end note
+
+note bottom of db
+  **Threats mitigated:**
+  - Information disclosure
+    (encryption at rest + TLS)
+  - Tampering (checksums)
+end note
+
+note bottom of mq
+  **Threats mitigated:**
+  - Denial of service
+    (dead letter queues)
+  - Tampering (message signing)
+end note
+
+@enduml

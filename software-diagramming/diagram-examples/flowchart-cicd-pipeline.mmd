@@ -1,0 +1,34 @@
+%%{init: {'theme': 'neutral'}}%%
+flowchart TD
+    A[Push to main] --> B{Run Tests}
+    B -->|Pass| C[Build Docker Image]
+    B -->|Fail| Z[Notify Developer]
+
+    C --> D[Push to Registry]
+    D --> E{Security Scan}
+    E -->|Clean| F[Deploy to Staging]
+    E -->|Vulnerabilities Found| Z
+
+    F --> G{Run Smoke Tests}
+    G -->|Pass| H[Manual Approval Gate]
+    G -->|Fail| I[Rollback Staging]
+    I --> Z
+
+    H -->|Approved| J[Deploy to Production]
+    H -->|Rejected| K[Back to Development]
+    K --> Z
+
+    J --> L{Health Check}
+    L -->|Healthy| M[Route Traffic]
+    L -->|Unhealthy| N[Rollback Production]
+    N --> Z
+
+    M --> O[Monitor for 15 min]
+    O --> P{Error Rate OK?}
+    P -->|Yes| Q[Done - Deployment Complete]
+    P -->|No| N
+
+    style A fill:#4A90D9,color:white
+    style Q fill:#27AE60,color:white
+    style Z fill:#E74C3C,color:white
+    style H fill:#F39C12,color:white

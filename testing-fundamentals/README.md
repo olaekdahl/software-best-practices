@@ -84,3 +84,19 @@ pytest testing-fundamentals -q
 
 - Define behavior in bdd/features/calculator.feature with Given-When-Then.
 - Run bdd/run_bdd.py to execute step definitions in bdd/steps/.
+
+---
+
+## Additional demos
+
+- `fixtures-and-parametrize/` — Fixtures, parametrize, and markers for an inventory system (`pytest.ini` included).
+- `property-based-testing/` — Hypothesis property-based testing: roundtrip encodings, invariants, and fuzzing.
+
+```bash
+# Fixtures and parametrize
+cd testing-fundamentals/fixtures-and-parametrize && pytest -v
+
+# Property-based testing with Hypothesis
+pip install hypothesis
+cd testing-fundamentals/property-based-testing && pytest -v
+```

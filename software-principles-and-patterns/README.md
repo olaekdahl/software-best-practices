@@ -137,3 +137,24 @@ Ask teams to justify their choice and tradeoffs.
 ## Bonus: Bad-smell spotting snippet
 
 Use `smell_spotting.py` for a quick "find-the-violations" warmup.
+
+---
+
+## Additional demos
+
+### 03-api-design — REST API Best Practices
+
+A FastAPI app demonstrating REST API design best practices: RFC 7807 error responses, cursor pagination, content negotiation, and a matching OpenAPI spec.
+
+```bash
+pip install fastapi uvicorn pydantic
+uvicorn software-principles-and-patterns.03-api-design.app:app --reload
+```
+
+### 04-modular-architecture — Modular Monolith
+
+Clean layered architecture demo: domain → application → infrastructure → API, with module boundaries and a PlantUML architecture diagram.
+
+```bash
+python software-principles-and-patterns/04-modular-architecture/main.py
+```

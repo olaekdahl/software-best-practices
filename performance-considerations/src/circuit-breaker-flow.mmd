@@ -1,0 +1,73 @@
+%%{init: {'theme': 'neutral'}}%%
+sequenceDiagram
+    participant C as Client
+    participant CB as Circuit Breaker
+    participant R as Retry Logic
+    participant S as Service
+    participant F as Fallback
+
+    Note over CB: State: CLOSED (healthy)
+
+    C->>CB: Request 1
+    CB->>R: Forward request
+    R->>S: Attempt 1
+    S-->>R: 500 Internal Server Error
+    R->>S: Attempt 2 (after 1s backoff)
+    S-->>R: 500 Internal Server Error
+    R->>S: Attempt 3 (after 2s backoff)
+    S-->>R: 200 OK
+    R-->>CB: Success
+    CB-->>C: Response
+
+    Note over CB: Failure count: 0 (reset on success)
+
+    C->>CB: Request 2
+    CB->>R: Forward request
+    R->>S: Attempt 1
+    S-->>R: 503 Service Unavailable
+    R->>S: Attempt 2
+    S-->>R: 503 Service Unavailable
+    R->>S: Attempt 3
+    S-->>R: 503 Service Unavailable
+    R-->>CB: Max retries exhausted
+
+    Note over CB: Failure count: 1/3
+
+    C->>CB: Request 3
+    CB->>R: Forward request
+    R->>S: All 3 attempts fail
+    R-->>CB: Failure
+
+    Note over CB: Failure count: 2/3
+
+    C->>CB: Request 4
+    CB->>R: Forward request
+    R->>S: All 3 attempts fail
+    R-->>CB: Failure
+
+    Note over CB: Failure count: 3/3<br/>State: OPEN
+
+    rect rgb(253, 237, 236)
+        C->>CB: Request 5
+        CB-->>C: Fail fast (circuit open)
+        Note right of CB: No request sent to service
+
+        C->>CB: Request 6
+        CB-->>C: Fail fast (circuit open)
+    end
+
+    Note over CB: After 30s timeout<br/>State: HALF-OPEN
+
+    rect rgb(232, 248, 245)
+        C->>CB: Request 7 (probe)
+        CB->>S: Single test request
+        S-->>CB: 200 OK
+        Note over CB: State: CLOSED (recovered)
+    end
+
+    C->>CB: Request 8
+    CB->>R: Forward request
+    R->>S: Attempt 1
+    S-->>R: 200 OK
+    R-->>CB: Success
+    CB-->>C: Response

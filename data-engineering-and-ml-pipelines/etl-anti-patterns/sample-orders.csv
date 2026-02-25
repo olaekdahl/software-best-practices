@@ -1,0 +1,11 @@
+order_id,customer_name,product,quantity,unit_price,order_date,status
+ORD-000001,Alice Johnson,Wireless Mouse,2,29.99,2026-01-15,confirmed
+ORD-000002,Bob Smith,USB-C Hub,1,49.99,2026-01-15,confirmed
+ORD-000003,Charlie Brown,Mechanical Keyboard,1,129.99,2026-01-16,shipped
+ORD-000004,,Monitor Stand,1,39.99,2026-01-16,confirmed
+ORD-000005,Diana Prince,Laptop Bag,-3,59.99,2026-01-17,confirmed
+ORD-000006,Eve Wilson,Webcam HD,2,0.00,2026-01-17,pending
+ORD-000007,Frank Castle,USB Cable,5,9.99,2027-06-15,confirmed
+ORD-000008,Grace Hopper,SSD 1TB,1,89.99,2026-01-18,delivered
+ORD-000009,Hank Pym,RAM 16GB,4,45.99,2026-01-18,confirmed
+ORD-000010,Iris West,Power Supply,1,79.99,2026-01-19,invalid_status

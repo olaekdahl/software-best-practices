@@ -1,0 +1,36 @@
+@startuml c2_container
+skinparam defaultFontName Arial
+skinparam shadowing false
+skinparam ArrowColor #34495E
+skinparam RectangleBorderColor #34495E
+
+title C2 - Container: Online Bookstore
+
+actor "Customer" as cust
+actor "Admin" as admin
+
+rectangle "Online Bookstore" {
+  rectangle "Web App\n[React]" as web #LightBlue
+  rectangle "API Server\n[Python / FastAPI]" as api #LightBlue
+  database "Database\n[PostgreSQL]" as db #LightBlue
+  queue "Message Queue\n[RabbitMQ]" as mq #LightBlue
+  rectangle "Background Worker\n[Python]" as worker #LightBlue
+}
+
+rectangle "Payment Provider\n[External]" as payment #LightGray
+rectangle "Email Service\n[External]" as email #LightGray
+
+cust --> web : HTTPS
+admin --> web : HTTPS
+web --> api : REST / JSON
+api --> db : SQL
+api --> mq : Publishes events
+mq --> worker : Consumes events
+worker --> email : SMTP
+api --> payment : HTTPS
+
+note bottom of api
+  Zoom into one of these
+  containers for C3.
+end note
+@enduml

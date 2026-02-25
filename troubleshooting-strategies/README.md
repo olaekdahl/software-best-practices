@@ -106,3 +106,32 @@ kill -USR1 <pid>
 - Skipping steps: Document reproduction before coding a fix.
 - Tool fixation: Use tools to augment thought, not replace hypotheses.
 
+---
+
+## Additional demos
+
+These progressive demos extend the core troubleshooting curriculum:
+
+- `buggy-app/` — App with intentional bugs (off-by-one, race condition, etc.) for live debugging exercises.
+- `structured-logging/` — Structured JSON logging with correlation IDs, sensitive data masking, and logging config.
+- `hypothesis-driven-debug/` — Systematic hypothesis-test debugging loop on a "mystery" pipeline.
+- `observability-triage/` — RED/USE metrics, golden signals, and histogram buckets for production triage.
+- `incident-response/` — Runbook-driven incident response with blameless postmortem template.
+
+```bash
+# Buggy app exercise
+make -C troubleshooting-strategies demo-buggy-app
+
+# Structured logging with correlation IDs
+make -C troubleshooting-strategies demo-structured-logging
+
+# Hypothesis-driven debugging
+make -C troubleshooting-strategies demo-hypothesis-debug
+
+# Observability triage (RED/USE metrics)
+make -C troubleshooting-strategies demo-observability
+
+# Incident response playbook
+make -C troubleshooting-strategies demo-incident-response
+```
+

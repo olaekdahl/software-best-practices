@@ -42,7 +42,19 @@ make -C performance-considerations demo-db
 - `src/optimization.py` - caching with lru_cache, lazy file streaming vs eager load
 - `src/concurrency_demo.py` - IO-bound with threads, CPU-bound with processes
 - `src/db_queries.py` - SQLite N+1 queries vs single JOIN/GROUP BY
+### Additional demos
 
+- `src/caching_strategies.py` — TTL cache with LRU eviction, hit/miss tracking, negative caching, and cache bypass.
+- `src/resilience_patterns.py` — Circuit breaker, retry with exponential backoff, timeout, and bulkhead patterns.
+- `src/circuit-breaker-flow.mmd` — Mermaid diagram of the circuit breaker state machine.
+
+```bash
+# TTL caching with eviction and metrics
+make -C performance-considerations demo-caching
+
+# Resilience patterns (circuit breaker, retry, bulkhead)
+make -C performance-considerations demo-resilience
+```
 Tips:
 
 - Always measure before and after changes, don’t optimize blindly.

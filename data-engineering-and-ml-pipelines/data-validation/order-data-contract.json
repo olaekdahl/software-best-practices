@@ -1,0 +1,61 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Order Data Contract",
+  "description": "Schema defining the structure and constraints for order records in the data pipeline",
+  "type": "object",
+  "required": ["order_id", "customer_name", "product", "quantity", "unit_price", "order_date"],
+  "properties": {
+    "order_id": {
+      "type": "string",
+      "pattern": "^ORD-[0-9]{6}$",
+      "description": "Unique order identifier in format ORD-NNNNNN"
+    },
+    "customer_name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "description": "Customer full name (must not be empty)"
+    },
+    "product": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500,
+      "description": "Product name or SKU"
+    },
+    "quantity": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10000,
+      "description": "Number of units ordered (must be positive)"
+    },
+    "unit_price": {
+      "type": "number",
+      "minimum": 0.01,
+      "maximum": 999999.99,
+      "description": "Price per unit in USD (must be positive)"
+    },
+    "order_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Order date in ISO 8601 format (YYYY-MM-DD). Must not be in the future."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "confirmed", "shipped", "delivered", "cancelled"],
+      "default": "pending",
+      "description": "Current order status"
+    },
+    "shipping_address": {
+      "type": "object",
+      "properties": {
+        "street": {"type": "string"},
+        "city": {"type": "string"},
+        "state": {"type": "string"},
+        "zip": {"type": "string", "pattern": "^[0-9]{5}(-[0-9]{4})?$"},
+        "country": {"type": "string", "default": "US"}
+      },
+      "required": ["street", "city", "state", "zip"]
+    }
+  },
+  "additionalProperties": false
+}

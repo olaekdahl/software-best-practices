@@ -100,3 +100,27 @@ make -C code-quality-tools all       # run all quality gates
 ```
 
 Extend these gates (e.g., add `safety`, `pip-audit`) as your project matures.
+
+---
+
+## Additional demos
+
+### Modern Quality Pipeline (`quality-pipeline/`)
+
+A complete, modern quality pipeline using `ruff` (replaces flake8+isort+pyupgrade), `mypy`, `pytest-cov`, `pre-commit`, and a GitHub Actions CI workflow.
+
+Contents:
+- `pyproject.toml` — Unified tooling config (ruff, mypy, pytest, coverage).
+- `.pre-commit-config.yaml` — Pre-commit hooks for ruff, mypy, and trailing whitespace.
+- `.github/workflows/quality.yml` — CI workflow running all quality gates.
+- `src/user_service.py` — Sample typed service.
+- `tests/test_user_service.py` — Tests with coverage.
+
+```bash
+# Run the quality pipeline
+cd code-quality-tools/quality-pipeline
+pip install ruff mypy pytest pytest-cov
+ruff check src/ tests/
+mypy src/
+pytest --cov=src --cov-report=term-missing
+```

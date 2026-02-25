@@ -1,0 +1,30 @@
+%%{init: {'theme': 'neutral'}}%%
+gantt
+    title Sprint 12 - Order Service Improvements
+    dateFormat  YYYY-MM-DD
+    axisFormat  %b %d
+
+    section Planning
+    Sprint planning           :done, plan, 2026-02-23, 1d
+    Design review             :done, design, 2026-02-24, 1d
+
+    section Backend
+    Add order cancellation    :active, cancel, 2026-02-25, 3d
+    Implement retry logic     :retry, after cancel, 2d
+    Add pagination to list    :page, after cancel, 2d
+    Performance optimization  :perf, after retry, 2d
+
+    section Frontend
+    Cancel order UI           :ui-cancel, 2026-02-26, 3d
+    Order history pagination  :ui-page, after ui-cancel, 2d
+    Error handling updates    :ui-err, after ui-page, 1d
+
+    section Testing
+    Write integration tests   :test, after page, 3d
+    Load testing              :load, after perf, 2d
+    UAT sign-off              :uat, after test, 1d
+
+    section Release
+    Staging deploy            :milestone, staging, after uat, 0d
+    Production deploy         :deploy, after staging, 1d
+    Post-deploy monitoring    :monitor, after deploy, 1d

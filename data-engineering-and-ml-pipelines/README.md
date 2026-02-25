@@ -12,6 +12,13 @@ This folder contains small, runnable demos for common data/ML pipeline concepts.
 - ml-pipeline/ — Minimal ML pipeline: data prep → training (linear regression) → deploy with a tiny FastAPI service.
 - lineage/ — Lightweight data-lineage tracker: records assets, transformations, and dependencies as a DAG for impact analysis.
 
+### Additional demos
+
+- etl-anti-patterns/ — Naive ETL script showing anti-patterns (no error handling, hardcoded paths) as a teaching contrast.
+- idempotent-pipeline/ — Idempotent, resumable pipeline with hash-based deduplication and stage separation.
+- data-validation/ — Data contracts and schema validation at pipeline boundaries.
+- ml-lifecycle/ — Full ML lifecycle: train → validate → deploy → monitor with experiment tracking and model cards.
+
 See each subfolder for scripts and usage notes below.
 
 ## Quick run
@@ -49,6 +56,22 @@ Quick test after starting the server:
 ```bash
 curl http://127.0.0.1:8000/health
 curl "http://127.0.0.1:8000/predict?x=5"
+```
+
+### Additional demos
+
+```bash
+# Anti-pattern ETL (contrast with ingest_transform.py)
+python3 data-engineering-and-ml-pipelines/etl-anti-patterns/main.py
+
+# Idempotent pipeline with hash-based dedup
+python3 data-engineering-and-ml-pipelines/idempotent-pipeline/main.py
+
+# Data contracts and schema validation
+python3 data-engineering-and-ml-pipelines/data-validation/main.py
+
+# Full ML lifecycle (train → validate → deploy → monitor)
+python3 data-engineering-and-ml-pipelines/ml-lifecycle/main.py
 ```
 
 ## Makefile shortcuts

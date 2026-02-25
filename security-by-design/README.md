@@ -47,6 +47,24 @@ make -C security-by-design demo-validate
 - `src/insecure_deserialization.py` and `src/safe_deserialization.py` - pickle vs JSON+pydantic
 - `src/input_validation.py` - sanitization and validation helpers
 
+### Additional demos
+
+- `src/threat-model.puml` — STRIDE threat model as a PlantUML diagram.
+- `src/auth_jwt_deep_dive.py` — JWT with RBAC, token refresh, audience/issuer validation.
+- `src/secrets_management.py` — Environment-based secrets with rotation, auditing, and fail-fast patterns.
+- `secure-pipeline/` — SAST, SCA, and secret scanning in a CI pipeline (bandit config + GitHub Actions workflow).
+
+```bash
+# JWT deep-dive (refresh tokens, RBAC, audience validation)
+make -C security-by-design demo-jwt
+
+# Secrets management patterns
+make -C security-by-design demo-secrets
+
+# Secure CI pipeline demo
+make -C security-by-design demo-secure-pipeline
+```
+
 ## Key practices (cheat sheet)
 
 - Never concatenate SQL—use parameterized queries.

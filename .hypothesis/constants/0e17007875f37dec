@@ -1,0 +1,4 @@
+# file: /home/ola/ciracon/software-best-practices/genai-for-technical-writing/src/widgetizer/widget.py
+# hypothesis_version: 6.151.9
+
+[', ', '- Fields:', 'fields', 'name', 'tags']

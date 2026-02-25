@@ -16,4 +16,10 @@ demo-concurrency:
 demo-db:
 	python src/db_queries.py
 
-.PHONY: demo-algorithms demo-pitfalls demo-profiling demo-optimization demo-concurrency demo-db
+demo-caching:
+	python src/caching_strategies.py
+
+demo-resilience:
+	python src/resilience_patterns.py
+
+.PHONY: demo-algorithms demo-pitfalls demo-profiling demo-optimization demo-concurrency demo-db demo-caching demo-resilience

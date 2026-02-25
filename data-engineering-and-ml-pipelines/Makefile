@@ -55,6 +55,19 @@ prefect-flow:
 prefect-server:
 	$(PREFECT) server start
 
+# --- Additional demos ---
+etl-anti-patterns:
+	$(PY) etl-anti-patterns/main.py
+
+idempotent-pipeline:
+	$(PY) idempotent-pipeline/main.py
+
+data-validation:
+	$(PY) data-validation/main.py
+
+ml-lifecycle:
+	$(PY) ml-lifecycle/main.py
+
 clean:
 	rm -rf ingestion-and-transformation/output
 	rm -rf batch-vs-streaming/output

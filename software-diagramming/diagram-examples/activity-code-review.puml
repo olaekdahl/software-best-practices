@@ -1,0 +1,52 @@
+@startuml code_review_workflow
+skinparam defaultFontName Arial
+skinparam shadowing false
+skinparam ArrowColor #34495E
+skinparam RectangleBorderColor #34495E
+
+title Code Review Workflow
+
+start
+
+:Developer pushes feature branch;
+
+:Open Pull Request;
+
+fork
+  :Run CI Pipeline;
+  if (Tests pass?) then (yes)
+    :Mark checks green;
+  else (no)
+    :Notify developer;
+    stop
+  endif
+fork again
+  :Auto-assign reviewers\nbased on CODEOWNERS;
+end fork
+
+:Reviewer examines changes;
+
+while (Review complete?) is (needs changes)
+  :Reviewer leaves comments;
+  :Developer addresses feedback;
+  :Push updated commits;
+  :CI runs again;
+endwhile (approved)
+
+:Reviewer approves PR;
+
+if (Merge conflicts?) then (yes)
+  :Developer rebases\non main;
+  :CI runs again;
+else (no)
+endif
+
+:Squash and merge to main;
+
+:CI deploys to staging;
+
+:Delete feature branch;
+
+stop
+
+@enduml

@@ -1,0 +1,32 @@
+%%{init: {'theme': 'neutral'}}%%
+flowchart TD
+    cust["👤 Customer"]
+    admin["👤 Admin"]
+
+    subgraph bookstore ["Online Bookstore"]
+        web["Web App<br/><i>[React]</i>"]
+        api["API Server<br/><i>[Python / FastAPI]</i>"]
+        db[("Database<br/><i>[PostgreSQL]</i>")]
+        mq[["Message Queue<br/><i>[RabbitMQ]</i>"]]
+        worker["Background Worker<br/><i>[Python]</i>"]
+    end
+
+    payment["Payment Provider<br/><i>[External]</i>"]
+    email["Email Service<br/><i>[External]</i>"]
+
+    cust -->|"HTTPS"| web
+    admin -->|"HTTPS"| web
+    web -->|"REST / JSON"| api
+    api -->|"SQL"| db
+    api -->|"Publishes events"| mq
+    mq -->|"Consumes events"| worker
+    worker -->|"SMTP"| email
+    api -->|"HTTPS"| payment
+
+    style web fill:#add8e6,stroke:#34495E
+    style api fill:#add8e6,stroke:#34495E
+    style db fill:#add8e6,stroke:#34495E
+    style mq fill:#add8e6,stroke:#34495E
+    style worker fill:#add8e6,stroke:#34495E
+    style payment fill:#d3d3d3,stroke:#34495E
+    style email fill:#d3d3d3,stroke:#34495E

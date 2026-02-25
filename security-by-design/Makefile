@@ -16,4 +16,13 @@ demo-deser-safe:
 demo-validate:
 	python src/input_validation.py
 
-.PHONY: run-api demo-sql-vuln demo-sql-safe demo-deser-insecure demo-deser-safe demo-validate
+demo-jwt:
+	python src/auth_jwt_deep_dive.py
+
+demo-secrets:
+	python src/secrets_management.py
+
+demo-secure-pipeline:
+	python secure-pipeline/main.py
+
+.PHONY: run-api demo-sql-vuln demo-sql-safe demo-deser-insecure demo-deser-safe demo-validate demo-jwt demo-secrets demo-secure-pipeline

@@ -1,0 +1,297 @@
+openapi: "3.0.3"
+info:
+  title: Jobs API
+  version: "1.0.0"
+  description: |
+    Demo API showing best practices for REST design.
+    Demonstrates HTTP semantics, RFC 7807 errors, cursor pagination,
+    and OpenAPI-first documentation.
+  contact:
+    name: API Team
+    email: api-team@example.com
+
+servers:
+  - url: http://localhost:8000
+    description: Local development
+
+paths:
+  /v1/jobs:
+    get:
+      summary: List jobs with cursor pagination
+      operationId: listJobs
+      tags: [Jobs]
+      parameters:
+        - name: cursor
+          in: query
+          description: Opaque cursor for pagination (from previous response)
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Maximum number of results per page
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+        - name: status
+          in: query
+          description: Filter by job status
+          schema:
+            type: string
+            enum: [queued, running, completed, failed]
+      responses:
+        "200":
+          description: Paginated list of jobs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedResponse"
+        "400":
+          description: Invalid cursor
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+
+    post:
+      summary: Create a new job
+      operationId: createJob
+      tags: [Jobs]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JobRequest"
+      responses:
+        "201":
+          description: Job created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobResponse"
+        "422":
+          description: Validation error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+
+  /v1/jobs/{job_id}:
+    get:
+      summary: Get a job by ID
+      operationId: getJob
+      tags: [Jobs]
+      parameters:
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Job details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobResponse"
+        "404":
+          description: Job not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+
+    patch:
+      summary: Partially update a job
+      operationId: updateJob
+      tags: [Jobs]
+      parameters:
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: "Fields to update. Allowed: name, priority, tags, status."
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 200
+                priority:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+                tags:
+                  type: array
+                  items:
+                    type: string
+                  maxItems: 10
+                status:
+                  type: string
+                  enum: [queued, running, completed, failed]
+      responses:
+        "200":
+          description: Updated job
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobResponse"
+        "404":
+          description: Job not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "422":
+          description: Validation error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+
+    delete:
+      summary: Delete a job
+      operationId: deleteJob
+      tags: [Jobs]
+      parameters:
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Job deleted (idempotent — returns 204 even if job did not exist)
+
+  /health:
+    get:
+      summary: Health check
+      operationId: healthCheck
+      tags: [System]
+      responses:
+        "200":
+          description: Service health status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "ok"
+                  jobs_count:
+                    type: integer
+                    example: 25
+
+components:
+  schemas:
+    JobRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Job name (must not be blank)
+          example: "data-export-2026-01"
+        priority:
+          type: integer
+          minimum: 1
+          maximum: 5
+          default: 1
+          description: Priority 1-5
+        tags:
+          type: array
+          items:
+            type: string
+          maxItems: 10
+          default: []
+
+    JobResponse:
+      type: object
+      required: [id, name, priority, tags, status, created_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        name:
+          type: string
+          example: "data-export-2026-01"
+        priority:
+          type: integer
+          minimum: 1
+          maximum: 5
+        tags:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+          enum: [queued, running, completed, failed]
+        created_at:
+          type: string
+          format: date-time
+
+    PaginatedResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/JobResponse"
+        next_cursor:
+          type: string
+          nullable: true
+          description: Cursor to fetch the next page (null if no more results)
+        total:
+          type: integer
+          description: Total number of matching results
+
+    ProblemDetail:
+      type: object
+      description: RFC 7807 Problem Details
+      required: [type, title, status, detail]
+      properties:
+        type:
+          type: string
+          format: uri
+          example: "https://api.example.com/problems/not-found"
+        title:
+          type: string
+          example: "Not Found"
+        status:
+          type: integer
+          example: 404
+        detail:
+          type: string
+          example: "Job 550e8400-... does not exist."
+        instance:
+          type: string
+          format: uri
+        code:
+          type: string
+          description: Machine-readable error code
+          example: "job_not_found"
+        errors:
+          type: array
+          description: Field-level validation errors
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
