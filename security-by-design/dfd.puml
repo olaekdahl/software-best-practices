@@ -1,0 +1,91 @@
+@startuml
+title FundFlow - Data Flow Diagram
+
+skinparam rectangle {
+    BackgroundColor<<trustboundary>> transparent
+    BorderColor<<trustboundary>> red
+    BorderStyle<<trustboundary>> dashed
+}
+
+actor "Student\n(Employee)" as student
+actor "Manager\n(Approver)" as manager  
+actor "Admin\n(Finance)" as admin
+
+rectangle "Client Trust Boundary" <<trustboundary>> {
+    node "Browser\n(React SPA)" as browser {
+        component "localStorage\n[JWT Token]" as storage
+        component "React App\n(Vite)" as react
+    }
+}
+
+rectangle "Server Trust Boundary" <<trustboundary>> {
+    node "Express API\n:5051" as api {
+        component "/auth/login" as login
+        component "/auth/register" as register
+        component "/auth/me" as me
+        component "/api/items" as items
+        component "JWT Middleware" as jwt_mid
+    }
+}
+
+rectangle "Data Trust Boundary" <<trustboundary>> {
+    database "MongoDB\n(fundflowdb)" as db {
+        collections "Users" as users
+        collections "Items\n(Expenses)" as expenses
+    }
+}
+
+' User interactions
+student --> browser : HTTP :5171
+manager --> browser : HTTP :5171
+admin --> browser : HTTP :5171
+
+' Browser to API flows
+browser --> login : POST credentials
+browser --> register : POST email/password
+browser --> me : GET (with JWT)
+browser --> items : GET/POST (with JWT)
+
+' API internal flows
+login --> jwt_mid : validate
+register --> jwt_mid : generate token
+me --> jwt_mid : verify token
+items --> jwt_mid : verify token
+
+' API to DB flows
+login --> users : find by email
+register --> users : create user
+me --> users : find by id
+items --> expenses : find ALL (VULN!)
+items --> expenses : create
+
+' Token flow
+login ..> storage : store JWT
+storage ..> browser : read JWT
+
+' Annotations
+note right of storage #pink
+  **VULNERABILITY**
+  JWT in localStorage
+  vulnerable to XSS
+end note
+
+note bottom of items #pink
+  **VULNERABILITY**
+  Returns ALL items
+  (Broken Access Control)
+end note
+
+note right of login #yellow
+  **RISK**
+  No rate limiting
+  No account lockout
+end note
+
+note bottom of api #lightblue
+  **CORS**
+  origin: true
+  (too permissive)
+end note
+
+@enduml
